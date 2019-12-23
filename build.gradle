@@ -1,6 +1,12 @@
 plugins {
     id 'java'
+    id 'maven'
     id 'maven-publish'
+    id 'jacoco'
+    id 'com.github.kt3k.coveralls' version '2.8.4'
+    id "com.github.hierynomus.license" version "0.15.0"
+    id "com.jfrog.bintray" version "1.8.4"
+    id 'distribution'
 }
 
 repositories {
@@ -20,9 +26,90 @@ dependencies {
 }
 
 group = 'com.epam.healenium'
-version = '1.0-SNAPSHOT'
 sourceCompatibility = '8'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
+}
+
+ext {
+    bintrayUserName = (project.hasProperty('BINTRAY_USERNAME') ? project.findProperty('BINTRAY_USERNAME') : System.getenv()['BINTRAY_USERNAME'])
+    bintrayPassword = (project.hasProperty('BINTRAY_PASSWORD') ? project.findProperty('BINTRAY_PASSWORD') : System.getenv()['BINTRAY_PASSWORD'])
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = "sources"
+}
+
+task javadocJar(type: Jar) {
+    from javadoc.destinationDir
+    archiveClassifier = "javadoc"
+}
+
+publishing {
+    publications {
+        HealeniumPublication(MavenPublication) {
+            from components.java
+            artifact sourceJar
+            artifact javadocJar
+            pom {
+                name = "healenium-appium"
+                description = 'Appium adaptor for self-healing'
+                url = "https://github.com/healenium/healenium-appium.git"
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+bintray {
+    user = bintrayUserName
+    key = bintrayPassword
+    publications = ['HealeniumPublication']
+    dryRun = false
+    publish = true
+    pkg {
+        userOrg = 'epam'
+        repo = 'healenium'
+        name = 'healenium-appium'
+        desc = project.description
+        websiteUrl = 'https://github.com/healenium'
+        issueTrackerUrl = 'https://github.com/healenium/healenium-appium/issues'
+        vcsUrl = 'https://github.com/healenium/healenium-appium.git'
+        licenses = ['Apache-2.0']
+        labels = ['gradle', 'healenium']
+        publicDownloadNumbers = true
+        attributes = [:]
+        version {
+            name = project.version
+            vcsTag = project.version
+            attributes = [:]
+        }
+    }
+}
+
+bintrayUpload.onlyIf {
+    !project.version.toString().toUpperCase().endsWith("-SNAPSHOT") && !project.version.toString().toUpperCase().contains("-DEV")
+}
+
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        csv.enabled true
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
+
+license {
+    header rootProject.file('HEADER')
+    excludes(["**/*.html", "*.conf", "*.properties"])
+    strictCheck false
 }
