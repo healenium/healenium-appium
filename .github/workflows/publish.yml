@@ -14,6 +14,8 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+    - name: Make gradlew executable
+      run: chmod +x ./gradlew
     - name: Build with Gradle
       run: ./gradlew build
   publish:
@@ -35,6 +37,10 @@ jobs:
           echo $RELEASE_VERSION
           echo ${{ steps.vars.outputs.tag }}
       - name: Build with Gradle
-        run: ./gradlew build -x test -Pversion=${{ steps.vars.outputs.tag }}
+        run: |
+          chmod +x ./gradlew
+          ./gradlew build -x test -Pversion=${{ steps.vars.outputs.tag }}
       - name: bintray upload
-        run: ./gradlew -Pversion=${{ steps.vars.outputs.tag }} -PBINTRAY_USERNAME=${{ secrets.BINTRAY_USERNAME }} -PBINTRAY_PASSWORD=${{ secrets.BINTRAY_PASSWORD }} bintrayUpload javadoc --info --stacktrace
+        run: |
+          chmod +x ./gradlew
+          ./gradlew -Pversion=${{ steps.vars.outputs.tag }} -PBINTRAY_USERNAME=${{ secrets.BINTRAY_USERNAME }} -PBINTRAY_PASSWORD=${{ secrets.BINTRAY_PASSWORD }} bintrayUpload javadoc --info --stacktrace
