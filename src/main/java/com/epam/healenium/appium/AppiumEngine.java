@@ -40,10 +40,15 @@ import org.openqa.selenium.WebElement;
  */
 @Slf4j
 @SuppressWarnings("unchecked")
-public class AppiumEngine extends SelfHealingEngine<AppiumDriver, WebElement> {
+public class AppiumEngine<D extends AppiumDriver> extends SelfHealingEngine<D,WebElement> {
 
-    AppiumEngine(AppiumDriver driver, Config config) {
+    AppiumEngine(D driver, Config config) {
         super(driver, config);
+    }
+
+    @Override
+    public D getWebDriver() {
+        return super.getWebDriver();
     }
 
     @Override

@@ -26,6 +26,7 @@ import org.openqa.selenium.Capabilities;
  * <p>Overrides logic for MobileDriver.findElement* methods</p>
  */
 @Slf4j
+@SuppressWarnings("unchecked")
 public final class DriverWrapper {
 
     /**
@@ -33,31 +34,37 @@ public final class DriverWrapper {
      *
      * @param delegate the original driver.
      */
-    public static AppiumDriver wrap(AppiumDriver delegate) {
-        Config config = ConfigFactory.systemProperties().withFallback(ConfigFactory.load());
-        AppiumEngine engine = new AppiumEngine(delegate, config);
+    public static <T extends AppiumDriver> T wrap(T delegate) {
+        return wrap(delegate, null);
+    }
+
+    public static <T extends AppiumDriver> T wrap(T delegate, Config config) {
+        if(config == null){
+            config = ConfigFactory.systemProperties().withFallback(ConfigFactory.load());
+        }
+        AppiumEngine<T> engine = new AppiumEngine<>(delegate, config);
         return create(engine);
     }
 
-    static AppiumDriver create(AppiumEngine engine){
+    static <T extends AppiumDriver> T create(AppiumEngine engine){
+        T origin = (T) engine.getWebDriver();
         try{
-            AppiumDriver origin = engine.getWebDriver();
             ProxyFactory factory = new ProxyFactory();
-            factory.setSuperclass(AppiumDriver.class);
+            factory.setSuperclass(origin.getClass());
             factory.setFilter(
                 method -> {
                     String methodName = method.getName();
                     return methodName.startsWith("findElement") || methodName.equalsIgnoreCase("switchTo");
                 }
             );
-            return (AppiumDriver)factory.create(
+            return (T) factory.create(
                 new Class<?>[]{URL.class, Capabilities.class},
                 new Object[]{origin.getRemoteAddress(), origin.getCapabilities()},
                 new ProxyMethodHandler(engine)
             );
         } catch (Exception ex){
             log.error("Failed to create wrapper!", ex);
-            return engine.getWebDriver();
+            return origin;
         }
     }
 
