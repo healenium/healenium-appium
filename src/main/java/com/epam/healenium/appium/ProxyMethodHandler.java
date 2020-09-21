@@ -27,6 +27,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+
+import io.appium.java_client.MobileSelector;
 import javassist.util.proxy.MethodHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -70,6 +72,8 @@ public class ProxyMethodHandler implements MethodHandler {
                 return findElement(By.cssSelector((String) args[0]));
             case "findElementById":
                 return findElement(By.id((String) args[0]));
+            case "findElementByAccessibilityId":
+                return findElement(MobileSelector.ACCESSIBILITY.toString(), (String) args[0], "By.accessibilityId: " + (String) args[0]);
             case "findElementByXPath":
                 return findElement(By.xpath((String) args[0]));
             case "findElement":
@@ -90,8 +94,9 @@ public class ProxyMethodHandler implements MethodHandler {
 
     private WebElement findElement(By by) {
         if (config.getBoolean("heal-enabled")) {
-            String page = getPageName(by);
+            String page = "page";//getPageName(by);
             try {
+                log.info("!{}\n", by.toString());
                 WebElement element = delegate.findElement(by);
                 engine.savePath(by, page, element);
                 return element;
@@ -104,7 +109,25 @@ public class ProxyMethodHandler implements MethodHandler {
         }
     }
 
+    private WebElement findElement(String by, String using, String locator) {
+        if (config.getBoolean("heal-enabled")) {
+            String page = "page";//getPageName(by);
+            try {
+                WebElement element = delegate.findElement(by, using);
+                engine.savePath(locator, page, element);
+                return element;
+            } catch (NoSuchElementException ex) {
+                log.warn("Failed to find an element using locator {}\nReason: {}\nTrying to heal...", by.toString(), ex.getMessage());
+                return heal(locator, page, ex).orElse(null);
+            }
+        } else {
+            return delegate.findElement(by, using);
+        }
+    }
+
     private Optional<WebElement> heal(String locator, String pageName, NoSuchElementException e) {
+        log.info("\nlocator.hashCode of {} = {}\n", locator, locator.hashCode());
+
         if (!engine.isPathExists(locator, pageName)) {
             log.warn("Healing canceled because no locator data exists");
             return Optional.empty();

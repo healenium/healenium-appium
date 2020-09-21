@@ -44,7 +44,7 @@ for Maven projects:
  Wrapping driver instance with default config:
 ``` 
     //declare delegate driver
-    AppiumDriver driver = new AppiumDriver(new URL("http://0.0.0.0:4723/wd/hub"), capabilities);
+    AppiumDriver driver = new AndroidDriver<AndroidElement>(new URL("http://127.0.0.1:4723/wd/hub"), dc);
     //adding healing support
     driver = DriverWrapper.wrap(driver);
  ```
