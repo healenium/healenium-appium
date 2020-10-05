@@ -23,11 +23,9 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
+import io.appium.java_client.MobileBy;
 import io.appium.java_client.MobileSelector;
 import javassist.util.proxy.MethodHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -79,6 +77,9 @@ public class ProxyMethodHandler implements MethodHandler {
             case "findElement":
                 log.debug("Caught findElement: invoking the healing version...");
                 return findElement((By) args[0]);
+            case "findElements":
+                log.debug("Caught findElements: invoking the healing version...");
+                return findElements((By) args[0]);
             case "switchTo":
                 log.debug("Caught switchTo");
                 WebDriver.TargetLocator switched = (WebDriver.TargetLocator) proceed.invoke(delegate, args);
@@ -125,6 +126,27 @@ public class ProxyMethodHandler implements MethodHandler {
         }
     }
 
+    private List<WebElement> findElements(By by) {
+        if (config.getBoolean("heal-enabled")) {
+            String page = "page";//getPageName(by);
+            try {
+                log.info("!{}\n", by.toString());
+                List<WebElement> elements = delegate.findElements(by);
+                if (Objects.nonNull(elements) && !elements.isEmpty()) {
+                    engine.savePath(by, page, elements.get(0));
+                } else {
+                    throw new NoSuchElementException("Failed to find an element");
+                }
+                return elements;
+            } catch (NoSuchElementException ex) {
+                log.warn("Failed to find an element using locator {}\nReason: {}\nTrying to heal...", by.toString(), ex.getMessage());
+                return heals(by.toString(), page, ex).orElse(Collections.emptyList());
+            }
+        } else {
+            return delegate.findElements(by);
+        }
+    }
+
     private Optional<WebElement> heal(String locator, String pageName, NoSuchElementException e) {
         log.info("\nlocator.hashCode of {} = {}\n", locator, locator.hashCode());
 
@@ -137,6 +159,20 @@ public class ProxyMethodHandler implements MethodHandler {
             reportFailedInfo(locator, entry, healed);
             engine.saveLocator(info);
             return delegate.findElement(healed);
+        });
+    }
+
+    private Optional<List<WebElement>> heals(String locator, String pageName, NoSuchElementException e) {
+        log.info("\nlocator.hashCode of {} = {}\n", locator, locator.hashCode());
+        if (!engine.isPathExists(locator, pageName)) {
+            log.warn("Healing canceled because no locator data exists");
+            return Optional.empty();
+        }
+        LocatorInfo.Entry entry = reportBasicInfo(pageName, e);
+        return healLocator(locator, pageName).map(healed -> {
+            reportFailedInfo(locator, entry, healed);
+            engine.saveLocator(info);
+            return delegate.findElements(healed);
         });
     }
 
