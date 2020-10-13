@@ -44,7 +44,7 @@ public class DefaultActivity extends AndroidActivity {
     @Override
     protected DeviceElement prepare() {
         final DeviceElement main = DeviceElement.create("Main")
-            .waitStrategy(WaitStrategy.VISIBLE)
+            .waitStrategy(WaitStrategy.NONE)
             .forAndroid(By.id("android:id/content"));
         DeviceElement.create("Back")
             .parent(main)

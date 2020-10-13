@@ -17,7 +17,7 @@ servers:
 devices:
   android:
     app:
-      location: apps/android/xxxx.apk
+      location: apps/android/VodQA.apk
       external: false
       package: com.company.cwp.app
       activity: com.company.cwp.app.activity.xxxx.MainActivity

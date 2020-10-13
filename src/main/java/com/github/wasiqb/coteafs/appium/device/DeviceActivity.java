@@ -20,11 +20,9 @@ import static com.github.wasiqb.coteafs.appium.utils.ErrorUtils.fail;
 import static java.time.Duration.ofSeconds;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfAllElementsLocatedBy;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
+import com.epam.healenium.engine.HealException;
 import com.github.wasiqb.coteafs.appium.checker.ServerChecker;
 import com.github.wasiqb.coteafs.appium.config.DeviceSetting;
 import com.github.wasiqb.coteafs.appium.config.PlaybackSetting;
@@ -36,7 +34,9 @@ import com.github.wasiqb.coteafs.appium.error.AppiumServerStoppedError;
 import com.github.wasiqb.coteafs.appium.error.DeviceElementFindTimedOutError;
 import com.github.wasiqb.coteafs.appium.error.DeviceElementNameNotFoundError;
 import com.github.wasiqb.coteafs.appium.error.DeviceElementNotFoundError;
+import com.github.wasiqb.coteafs.appium.utils.StringUtil;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileBy;
 import io.appium.java_client.MobileElement;
 import io.appium.java_client.TouchAction;
 import org.apache.logging.log4j.LogManager;
@@ -151,6 +151,7 @@ public abstract class DeviceActivity<D extends AppiumDriver<MobileElement>, E ex
 
     private MobileElement find(final D deviceDriver, final DeviceElement parent, final By locator, final int index,
         final WaitStrategy strategy) {
+        String findBy = locator.toString().replaceAll("By.AccessibilityId: ", "");
         try {
             wait(locator, strategy);
             List<MobileElement> result = null;
@@ -159,6 +160,7 @@ public abstract class DeviceActivity<D extends AppiumDriver<MobileElement>, E ex
                     index);
                 final MobileElement mobileElement = getElement(parent.name());
                 result = mobileElement.findElements(locator);
+                this.device.getHealeniumDriver().findElements(By.xpath("//*[contains(@content-desc, '" + findBy + "')]"));
             } else {
                 log.trace("Finding root element using [{}] at index [{}]...", locator, index);
                 result = deviceDriver.findElements(locator);
@@ -173,6 +175,10 @@ public abstract class DeviceActivity<D extends AppiumDriver<MobileElement>, E ex
         } catch (final InvalidSelectorException e) {
             fail(AppiumSelectorNotImplementedError.class, "Selector not supported", e);
         } catch (final Exception e) {
+            if (parent != null) {
+                List<MobileElement> result = this.device.getHealeniumDriver().findElements(By.xpath("//*[contains(@content-desc, '" + findBy + "')]"));
+                return result.get(0);
+            }
             captureScreenshotOnError();
             String message = "";
             if (parent == null) {

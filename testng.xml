@@ -17,12 +17,12 @@
                 <methods>
                     <include name="testLogin"/>
                     <include name="testLongPress"/>
-                    <include name="testDoubleTap"/>
-                    <include name="testDragDrop"/>
-                    <include name="testNativeView"/>
-                    <include name="testSlider"/>
-                    <include name="testVerticleSwipe"/>
-                    <include name="testRotation"/>
+<!--                    <include name="testDoubleTap"/>-->
+<!--                    <include name="testDragDrop"/>-->
+<!--                    <include name="testNativeView"/>-->
+<!--                    <include name="testSlider"/>-->
+<!--                    <include name="testVerticleSwipe"/>-->
+<!--                    <include name="testRotation"/>-->
                 </methods>
             </class>
         </classes>

@@ -15,13 +15,11 @@
  */
 package com.github.wasiqb.coteafs.appium.android;
 
+import com.epam.healenium.appium.DriverWrapper;
 import com.github.wasiqb.coteafs.appium.android.vodqa.activities.MainActivity;
 import com.github.wasiqb.coteafs.appium.service.AppiumServer;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Parameters;
+import io.appium.java_client.AppiumDriver;
+import org.testng.annotations.*;
 
 /**
  * @author wasiq.bhamla

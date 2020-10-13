@@ -75,6 +75,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.epam.healenium.appium.DriverWrapper;
 import com.github.wasiqb.coteafs.appium.checker.ServerChecker;
 import com.github.wasiqb.coteafs.appium.config.AppiumSetting;
 import com.github.wasiqb.coteafs.appium.config.DeviceSetting;
@@ -120,6 +121,7 @@ public abstract class Device<D extends AppiumDriver<MobileElement>, T extends To
     protected final AppiumServer        server;
     protected final DeviceSetting       setting;
     private final   PlatformType        platform;
+    private         AppiumDriver        healeniumDriver;
 
     /**
      * @param server
@@ -164,6 +166,15 @@ public abstract class Device<D extends AppiumDriver<MobileElement>, T extends To
     public D getDriver() {
         LOG.trace("Getting [{}] device driver...", this.platform);
         return this.driver;
+    }
+
+    /**
+     * @return healeniumDriver
+     * @author alxkor
+     */
+    public AppiumDriver getHealeniumDriver() {
+        LOG.trace("Getting [{}] Healenium driver...", this.platform);
+        return this.healeniumDriver;
     }
 
     /**
@@ -379,6 +390,7 @@ public abstract class Device<D extends AppiumDriver<MobileElement>, T extends To
         LOG.trace("Starting [{}] device driver...", this.platform);
         try {
             this.driver = init(this.server.getServiceUrl(), this.capabilities);
+            this.healeniumDriver = DriverWrapper.wrap(getDriver());
         } catch (final Exception e) {
             fail(DeviceDriverNotStartingError.class, "Error occured starting device driver", e);
         }

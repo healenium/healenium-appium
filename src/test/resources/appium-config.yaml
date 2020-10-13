@@ -1,5 +1,6 @@
 server: &default_server
-  appium_js_path: /usr/local/lib/node_modules/appium/build/lib/main.js
+  appium_js_path: C:\Users\Aleksei_Korobov\AppData\Roaming\npm\node_modules\appium\lib\main.js
+  external: true
   arguments:
     log_level: DEBUG
     log_time_stamp: true
@@ -16,7 +17,7 @@ servers:
   ios:
     host: 0.0.0.0
     port: 4725
-    appium_js_path: /usr/local/lib/node_modules/appium/build/lib/main.js
+    appium_js_path: C:\Users\Aleksei_Korobov\AppData\Roaming\npm\node_modules\appium\lib\main.js
     arguments:
       log_level: DEBUG
       log_time_stamp: true
@@ -50,20 +51,20 @@ device: &default_device
 devices:
   test_local:
     device_name: emulator-5554
-    device_version: 8.1
+    device_version: 8.0
     app_location: apps/android/VodQA.apk
     automation_name: UIAUTOMATOR2
     <<: *default_device
     device_type: SIMULATOR
     android:
-      avd: emulator-5554
+      avd: Nexus_6_API_26
       avd_launch_timeout: 60000
       avd_ready_timeout: 60000
       avd_args: -gpu swiftshader_indirect
       apk_install_timeout: 60000
   test_browserstack:
-    device_name: Samsung Galaxy S8
-    device_version: 7.0
+    device_name: Nexus 6
+    device_version: 6.0
     app_location: ${env.app}
     cloud_app: true
     automation_name: APPIUM

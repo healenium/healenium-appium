@@ -124,5 +124,20 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<dependency>
+			<groupId>com.epam.healenium</groupId>
+			<artifactId>healenium-appium</artifactId>
+			<version>1.0.2</version>
+		</dependency>
 	</dependencies>
+	<repositories>
+		<repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>bintray-epam-healenium</id>
+			<name>bintray</name>
+			<url>https://dl.bintray.com/epam/healenium</url>
+		</repository>
+	</repositories>
 </project>
