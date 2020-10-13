@@ -25,7 +25,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import io.appium.java_client.MobileBy;
 import io.appium.java_client.MobileSelector;
 import javassist.util.proxy.MethodHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +39,8 @@ import org.openqa.selenium.remote.ScreenshotException;
 
 @Slf4j
 public class ProxyMethodHandler implements MethodHandler {
+
+    public final static String PAGE_PREFIX = "page";
 
     private final AppiumDriver delegate;
     private final AppiumEngine engine;
@@ -95,9 +96,9 @@ public class ProxyMethodHandler implements MethodHandler {
 
     private WebElement findElement(By by) {
         if (config.getBoolean("heal-enabled")) {
-            String page = "page";//getPageName(by);
+            String page = PAGE_PREFIX; //buildPageName(by.toString());
             try {
-                log.info("!{}\n", by.toString());
+                log.info("Proxy method findElement {}", by.toString());
                 WebElement element = delegate.findElement(by);
                 engine.savePath(by, page, element);
                 return element;
@@ -110,32 +111,34 @@ public class ProxyMethodHandler implements MethodHandler {
         }
     }
 
-    private WebElement findElement(String by, String using, String locator) {
+    private WebElement findElement(String selector, String using, String locator) {
         if (config.getBoolean("heal-enabled")) {
-            String page = "page";//getPageName(by);
+            String page = PAGE_PREFIX; //buildPageName(selector);
             try {
-                WebElement element = delegate.findElement(by, using);
+                log.info("Proxy method findElement {} using: {}", selector, using);
+                WebElement element = delegate.findElement(selector, using);
                 engine.savePath(locator, page, element);
                 return element;
             } catch (NoSuchElementException ex) {
-                log.warn("Failed to find an element using locator {}\nReason: {}\nTrying to heal...", by.toString(), ex.getMessage());
+                log.warn("Failed to find an element using locator {}\nReason: {}\nTrying to heal...", selector.toString(), ex.getMessage());
                 return heal(locator, page, ex).orElse(null);
             }
         } else {
-            return delegate.findElement(by, using);
+            return delegate.findElement(selector, using);
         }
     }
 
     private List<WebElement> findElements(By by) {
         if (config.getBoolean("heal-enabled")) {
-            String page = "page";//getPageName(by);
+            String page = PAGE_PREFIX; //buildPageName(by.toString());
             try {
-                log.info("!{}\n", by.toString());
+                log.info("Proxy method findElements {}", by.toString());
                 List<WebElement> elements = delegate.findElements(by);
-                if (Objects.nonNull(elements) && !elements.isEmpty()) {
-                    engine.savePath(by, page, elements.get(0));
-                } else {
+                if (elements.isEmpty()) {
                     throw new NoSuchElementException("Failed to find an element");
+                }
+                for(WebElement element : elements) {
+                    engine.savePath(by, page, element);
                 }
                 return elements;
             } catch (NoSuchElementException ex) {
@@ -148,7 +151,7 @@ public class ProxyMethodHandler implements MethodHandler {
     }
 
     private Optional<WebElement> heal(String locator, String pageName, NoSuchElementException e) {
-        log.info("\nlocator.hashCode of {} = {}\n", locator, locator.hashCode());
+        log.info("locator.hashCode of {} = {}", locator, locator.hashCode());
 
         if (!engine.isPathExists(locator, pageName)) {
             log.warn("Healing canceled because no locator data exists");
@@ -163,7 +166,8 @@ public class ProxyMethodHandler implements MethodHandler {
     }
 
     private Optional<List<WebElement>> heals(String locator, String pageName, NoSuchElementException e) {
-        log.info("\nlocator.hashCode of {} = {}\n", locator, locator.hashCode());
+        log.info("locator.hashCode of {} = {}", locator, locator.hashCode());
+
         if (!engine.isPathExists(locator, pageName)) {
             log.warn("Healing canceled because no locator data exists");
             return Optional.empty();
@@ -255,14 +259,8 @@ public class ProxyMethodHandler implements MethodHandler {
         return engine.getWebDriver().getPageSource();
     }
 
-    private String getPageName(By by){
-        try{
-            return delegate.getTitle();
-        } catch (Exception ex){
-            String nameStub = DigestUtils.md5Hex(String.join("|", delegate.getContext(), by.toString()));
-            log.warn("Failed to get page title, the stub will be used");
-            return nameStub;
-        }
+    private String buildPageName(String selector){
+        return DigestUtils.md5Hex(String.join("|", delegate.getContext(), selector));
     }
 
 }
