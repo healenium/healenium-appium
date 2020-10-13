@@ -10,6 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import com.epam.healenium.appium.DriverWrapper;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
@@ -20,7 +21,6 @@ import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.net.MalformedURLException;
@@ -58,27 +58,19 @@ public class TestEmulatorCalcApp {
     @Test
     public void testResultHealed() {
         testAddOperation();
-        Assert.assertEquals(appiumDriver.findElementById("result").getText(), "61");
+        Assert.assertEquals(appiumDriver.findElementById("resul").getText(), "61");
     }
 
     @Test
     public void testFindElementsOk() {
-        List<MobileElement> elements = appiumDriver.findElements(By.xpath("//*[contains(@resource-id, 'digit')]"));
-        int sumOfDigits = 0;
-        for(WebElement element : elements) {
-            sumOfDigits += Integer.parseInt(element.getText());
-        }
-        Assert.assertEquals("Sum of digits", 45, sumOfDigits);
+        List<MobileElement> elements = appiumDriver.findElements(By.id("digit_7"));
+        Assert.assertEquals("Digit 7", "7", elements.get(0).getText());
     }
 
     @Test
     public void testFindElementsHealed() {
-        List<MobileElement> elements = appiumDriver.findElements(By.xpath("//*[contains(@resource-id, 'vigit')]"));
-        int sumOfDigits = 0;
-        for(WebElement element : elements) {
-            sumOfDigits += Integer.parseInt(element.getText());
-        }
-        Assert.assertEquals("Sum of healed digits", 7, sumOfDigits);
+        List<MobileElement> elements = appiumDriver.findElements(By.id("digit_77"));
+        Assert.assertEquals("Healed digit", "7", elements.get(0).getText());
     }
 
     private void testAddOperation() {
