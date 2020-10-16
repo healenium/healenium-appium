@@ -84,7 +84,7 @@ public class AppiumEngine<D extends AppiumDriver> extends SelfHealingEngine<D,We
         log.debug("ToLocator by Node: {}", node);
         By locator = construct(node);
         List<WebElement> elements = getWebDriver().findElements(locator);
-        if (elements.size() == 1) {
+        if (elements.size() >= 1) {
             return locator;
         }
         throw new HealException();

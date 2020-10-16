@@ -15,6 +15,15 @@ package com.epam.healenium.appium;
 import com.epam.healenium.engine.data.LocatorInfo;
 import com.typesafe.config.Config;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileElement;
+import io.appium.java_client.MobileSelector;
+import javassist.util.proxy.MethodHandler;
+import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.*;
+import org.openqa.selenium.io.FileHandler;
+import org.openqa.selenium.remote.ScreenshotException;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -24,18 +33,6 @@ import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-
-import io.appium.java_client.MobileSelector;
-import javassist.util.proxy.MethodHandler;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.io.FileHandler;
-import org.openqa.selenium.remote.ScreenshotException;
 
 @Slf4j
 public class ProxyMethodHandler implements MethodHandler {
@@ -73,6 +70,8 @@ public class ProxyMethodHandler implements MethodHandler {
                 return findElement(By.id((String) args[0]));
             case "findElementByAccessibilityId":
                 return findElement(MobileSelector.ACCESSIBILITY.toString(), (String) args[0], "By.accessibilityId: " + (String) args[0]);
+            case "findElementsByAccessibilityId":
+                return findElements(MobileSelector.ACCESSIBILITY.toString(), (String) args[0], "By.accessibilityId: " + (String) args[0]);
             case "findElementByXPath":
                 return findElement(By.xpath((String) args[0]));
             case "findElement":
@@ -96,7 +95,7 @@ public class ProxyMethodHandler implements MethodHandler {
 
     private WebElement findElement(By by) {
         if (config.getBoolean("heal-enabled")) {
-            String page = PAGE_PREFIX; //buildPageName(by.toString());
+            String page = PAGE_PREFIX;
             try {
                 log.info("Proxy method findElement {}", by.toString());
                 WebElement element = delegate.findElement(by);
@@ -113,14 +112,14 @@ public class ProxyMethodHandler implements MethodHandler {
 
     private WebElement findElement(String selector, String using, String locator) {
         if (config.getBoolean("heal-enabled")) {
-            String page = PAGE_PREFIX; //buildPageName(selector);
+            String page = PAGE_PREFIX;
             try {
                 log.info("Proxy method findElement {} using: {}", selector, using);
                 WebElement element = delegate.findElement(selector, using);
-                engine.savePath(locator, page, element);
+                savePath(locator, page, element);
                 return element;
             } catch (NoSuchElementException ex) {
-                log.warn("Failed to find an element using locator {}\nReason: {}\nTrying to heal...", selector.toString(), ex.getMessage());
+                log.warn("Failed to find an element using locator {}\nReason: {}\nTrying to heal...", locator, ex.getMessage());
                 return heal(locator, page, ex).orElse(null);
             }
         } else {
@@ -128,18 +127,16 @@ public class ProxyMethodHandler implements MethodHandler {
         }
     }
 
-    private List<WebElement> findElements(By by) {
+    private List<MobileElement> findElements(By by) {
         if (config.getBoolean("heal-enabled")) {
-            String page = PAGE_PREFIX; //buildPageName(by.toString());
+            String page = PAGE_PREFIX;
             try {
                 log.info("Proxy method findElements {}", by.toString());
-                List<WebElement> elements = delegate.findElements(by);
+                List<MobileElement> elements = delegate.findElements(by);
                 if (elements.isEmpty()) {
                     throw new NoSuchElementException("Failed to find an element");
                 }
-                for(WebElement element : elements) {
-                    engine.savePath(by, page, element);
-                }
+                savePath(by, page, elements);
                 return elements;
             } catch (NoSuchElementException ex) {
                 log.warn("Failed to find an element using locator {}\nReason: {}\nTrying to heal...", by.toString(), ex.getMessage());
@@ -147,6 +144,40 @@ public class ProxyMethodHandler implements MethodHandler {
             }
         } else {
             return delegate.findElements(by);
+        }
+    }
+
+    private List<MobileElement> findElements(String selector, String using, String locator) {
+        if (config.getBoolean("heal-enabled")) {
+            String page = PAGE_PREFIX;
+            try {
+                log.info("Proxy method findElement {} using: {}", selector, using);
+                List<MobileElement> elements = delegate.findElements(selector, using);
+                if (elements.isEmpty()) {
+                    throw new NoSuchElementException("Failed to find an element");
+                }
+                savePath(locator, page, elements);
+                return elements;
+            } catch (NoSuchElementException ex) {
+                log.warn("Failed to find an element using locator {}\nReason: {}\nTrying to heal...", locator, ex.getMessage());
+                return heals(locator, page, ex).orElse(Collections.emptyList());
+            }
+        } else {
+            return delegate.findElements(selector, using);
+        }
+    }
+
+    private void savePath(Object locator, String page, WebElement element) {
+        if (config.getBoolean("heal-enabled")) {
+            engine.savePath(locator, page, element);
+        }
+    }
+
+    private void savePath(Object locator, String page, List<MobileElement> elements) {
+        if (config.getBoolean("heal-enabled")) {
+            for (MobileElement element : elements) {
+                engine.savePath(locator, page, element);
+            }
         }
     }
 
@@ -165,7 +196,7 @@ public class ProxyMethodHandler implements MethodHandler {
         });
     }
 
-    private Optional<List<WebElement>> heals(String locator, String pageName, NoSuchElementException e) {
+    private Optional<List<MobileElement>> heals(String locator, String pageName, NoSuchElementException e) {
         log.info("locator.hashCode of {} = {}", locator, locator.hashCode());
 
         if (!engine.isPathExists(locator, pageName)) {
@@ -257,10 +288,6 @@ public class ProxyMethodHandler implements MethodHandler {
 
     private String pageSource() {
         return engine.getWebDriver().getPageSource();
-    }
-
-    private String buildPageName(String selector){
-        return DigestUtils.md5Hex(String.join("|", delegate.getContext(), selector));
     }
 
 }

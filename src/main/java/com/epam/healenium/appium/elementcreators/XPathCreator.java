@@ -33,12 +33,15 @@ public class XPathCreator implements ElementCreator {
             String id = current.getId();
             String resourceId = current.getOtherAttributes().getOrDefault("resource-id", "");
             String text = current.getOtherAttributes().getOrDefault("text", "");
+            String contentDesc = current.getOtherAttributes().getOrDefault("content-desc", "");
             if (!StringUtils.isEmpty(id)) {
                 item += "[@id = '" + id + "']";
             } else if (!StringUtils.isEmpty(resourceId)) {
                 item += "[@resource-id = '" + resourceId + "']";
             } else if (!StringUtils.isEmpty(text)) {
                 item += "[@text = '" + text + "']";
+            } else if (!StringUtils.isEmpty(contentDesc)) {
+                item += "[@content-desc = '" + contentDesc + "']";
             }
             path.addFirst(item);
             if (!StringUtils.isEmpty(id) || !StringUtils.isEmpty(resourceId)) {
