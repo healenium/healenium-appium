@@ -18,6 +18,7 @@ import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
 import io.appium.java_client.remote.MobileCapabilityType;
 import org.junit.Assert;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
@@ -26,13 +27,14 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 
 public class TestEmulatorCalcApp {
 
     private static AppiumDriver appiumDriver;
 
     @BeforeAll
-    public static void createDriver() throws MalformedURLException {
+    public static void setUp() throws MalformedURLException {
         DesiredCapabilities dc = new DesiredCapabilities();
         dc.setCapability(MobileCapabilityType.DEVICE_NAME, "emulator-5554");
         dc.setCapability(MobileCapabilityType.PLATFORM_NAME, "android");
@@ -86,5 +88,12 @@ public class TestEmulatorCalcApp {
         el5.click();
         MobileElement el6 = (MobileElement) appiumDriver.findElementByAccessibilityId("equals");
         el6.click();
+    }
+
+    @AfterAll
+    public static void tearDown() {
+        if (appiumDriver != null) {
+            appiumDriver.quit();
+        }
     }
 }
