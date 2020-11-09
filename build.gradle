@@ -16,6 +16,7 @@ repositories {
 }
 
 dependencies {
+    compile 'org.seleniumhq.selenium:selenium-java:3.141.59'
     compile 'com.epam.healenium:healenium-engine:1.0-RC'
     compile 'org.javassist:javassist:3.26.0-GA'
     compile 'io.appium:java-client:7.3.0'
