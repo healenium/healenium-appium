@@ -1,4 +1,4 @@
-/**
+package com.epam.healenium; /**
  * Healenium-appium Copyright (C) 2019 EPAM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,12 @@ import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
 import io.appium.java_client.remote.MobileCapabilityType;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.net.MalformedURLException;
@@ -29,50 +30,42 @@ import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 
-public class TestEmulatorCalcApp {
+@Slf4j
+public class TestEmulatorCalcApp extends AbstractBackendIT{
 
     private static AppiumDriver appiumDriver;
 
+    @SneakyThrows
     @BeforeAll
     public static void setUp() throws MalformedURLException {
         DesiredCapabilities dc = new DesiredCapabilities();
+
         dc.setCapability(MobileCapabilityType.DEVICE_NAME, "emulator-5554");
         dc.setCapability(MobileCapabilityType.PLATFORM_NAME, "android");
         dc.setCapability("appPackage", "com.android.calculator2");
         dc.setCapability("appActivity", ".Calculator");
 
+        dc.setCapability("test_data:testResultOk:result", "testResultHealed:resul");
+
         //declare delegate driver
         appiumDriver = new AndroidDriver<AndroidElement>(new URL("http://127.0.0.1:4723/wd/hub"), dc);
-
-        // FIXME Couldn't establish connection with AppiumDriver by default
-        // AppiumDriver ad = new AppiumDriver(new URL("http://127.0.0.1:4723/wd/hub"), dc);
 
         //adding healing support
         appiumDriver = DriverWrapper.wrap(appiumDriver);
     }
 
+    @SneakyThrows
     @Test
     public void testResultOk() {
         testAddOperation();
         Assert.assertEquals(appiumDriver.findElementById("result").getText(), "61");
     }
 
+    @SneakyThrows
     @Test
     public void testResultHealed() {
         testAddOperation();
         Assert.assertEquals(appiumDriver.findElementById("resul").getText(), "61");
-    }
-
-    @Test
-    public void testFindElementsOk() {
-        List<MobileElement> elements = appiumDriver.findElements(By.id("digit_7"));
-        Assert.assertEquals("Digit 7", "7", elements.get(0).getText());
-    }
-
-    @Test
-    public void testFindElementsHealed() {
-        List<MobileElement> elements = appiumDriver.findElements(By.id("digit_77"));
-        Assert.assertEquals("Healed digit", "7", elements.get(0).getText());
     }
 
     private void testAddOperation() {
