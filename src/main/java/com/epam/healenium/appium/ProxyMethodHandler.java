@@ -13,10 +13,11 @@
 package com.epam.healenium.appium;
 
 import com.epam.healenium.engine.data.LocatorInfo;
+import com.epam.healenium.utils.StackUtils;
 import com.typesafe.config.Config;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileBy;
 import io.appium.java_client.MobileElement;
-import io.appium.java_client.MobileSelector;
 import javassist.util.proxy.MethodHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.NoSuchElementException;
@@ -69,9 +70,9 @@ public class ProxyMethodHandler implements MethodHandler {
             case "findElementById":
                 return findElement(By.id((String) args[0]));
             case "findElementByAccessibilityId":
-                return findElement(MobileSelector.ACCESSIBILITY.toString(), (String) args[0], "By.accessibilityId: " + (String) args[0]);
+                return findElement(MobileBy.ByAccessibilityId.AccessibilityId((String) args[0]));
             case "findElementsByAccessibilityId":
-                return findElements(MobileSelector.ACCESSIBILITY.toString(), (String) args[0], "By.accessibilityId: " + (String) args[0]);
+                return findElements(MobileBy.ByAccessibilityId.AccessibilityId((String) args[0]));
             case "findElementByXPath":
                 return findElement(By.xpath((String) args[0]));
             case "findElement":
@@ -97,33 +98,19 @@ public class ProxyMethodHandler implements MethodHandler {
         if (config.getBoolean("heal-enabled")) {
             String page = PAGE_PREFIX;
             try {
-                log.info("Proxy method findElement {}", by.toString());
                 WebElement element = delegate.findElement(by);
-                engine.savePath(by, page, element);
+                if (config.getBoolean("backend-integration")) {
+                    savePath(by, element);
+                } else {
+                    savePath(by, page, element);
+                }
                 return element;
             } catch (NoSuchElementException ex) {
                 log.warn("Failed to find an element using locator {}\nReason: {}\nTrying to heal...", by.toString(), ex.getMessage());
-                return heal(by.toString(), page, ex).orElse(null);
+                return heal(by, page, ex).orElse(null);
             }
         } else {
             return delegate.findElement(by);
-        }
-    }
-
-    private WebElement findElement(String selector, String using, String locator) {
-        if (config.getBoolean("heal-enabled")) {
-            String page = PAGE_PREFIX;
-            try {
-                log.info("Proxy method findElement {} using: {}", selector, using);
-                WebElement element = delegate.findElement(selector, using);
-                savePath(locator, page, element);
-                return element;
-            } catch (NoSuchElementException ex) {
-                log.warn("Failed to find an element using locator {}\nReason: {}\nTrying to heal...", locator, ex.getMessage());
-                return heal(locator, page, ex).orElse(null);
-            }
-        } else {
-            return delegate.findElement(selector, using);
         }
     }
 
@@ -131,82 +118,79 @@ public class ProxyMethodHandler implements MethodHandler {
         if (config.getBoolean("heal-enabled")) {
             String page = PAGE_PREFIX;
             try {
-                log.info("Proxy method findElements {}", by.toString());
                 List<MobileElement> elements = delegate.findElements(by);
                 if (elements.isEmpty()) {
                     throw new NoSuchElementException("Failed to find an element");
                 }
-                savePath(by, page, elements);
+                if (config.getBoolean("backend-integration")) {
+                    savePath(by, elements);
+                } else {
+                    savePath(by, page, elements);
+                }
                 return elements;
             } catch (NoSuchElementException ex) {
                 log.warn("Failed to find an element using locator {}\nReason: {}\nTrying to heal...", by.toString(), ex.getMessage());
-                return heals(by.toString(), page, ex).orElse(Collections.emptyList());
+                return heals(by, page, ex).orElse(Collections.emptyList());
             }
         } else {
             return delegate.findElements(by);
         }
     }
 
-    private List<MobileElement> findElements(String selector, String using, String locator) {
-        if (config.getBoolean("heal-enabled")) {
-            String page = PAGE_PREFIX;
-            try {
-                log.info("Proxy method findElement {} using: {}", selector, using);
-                List<MobileElement> elements = delegate.findElements(selector, using);
-                if (elements.isEmpty()) {
-                    throw new NoSuchElementException("Failed to find an element");
-                }
-                savePath(locator, page, elements);
-                return elements;
-            } catch (NoSuchElementException ex) {
-                log.warn("Failed to find an element using locator {}\nReason: {}\nTrying to heal...", locator, ex.getMessage());
-                return heals(locator, page, ex).orElse(Collections.emptyList());
-            }
-        } else {
-            return delegate.findElements(selector, using);
-        }
+    private void savePath(Object locator, String page, WebElement element) {
+        engine.savePath(locator, page, element);
     }
 
-    private void savePath(Object locator, String page, WebElement element) {
-        if (config.getBoolean("heal-enabled")) {
+    private void savePath(By by, WebElement element) {
+        engine.savePath(by, element);
+    }
+
+    private void savePath(Object locator, String page, List<MobileElement> elements) {
+        for (MobileElement element : elements) {
             engine.savePath(locator, page, element);
         }
     }
 
-    private void savePath(Object locator, String page, List<MobileElement> elements) {
-        if (config.getBoolean("heal-enabled")) {
-            for (MobileElement element : elements) {
-                engine.savePath(locator, page, element);
-            }
+    private void savePath(By by, List<MobileElement> elements) {
+        for (MobileElement element : elements) {
+            engine.savePath(by, element);
         }
     }
 
-    private Optional<WebElement> heal(String locator, String pageName, NoSuchElementException e) {
+    private Optional<WebElement> heal(By by, String pageName, NoSuchElementException ex) {
+        String locator = by.toString();
         log.info("locator.hashCode of {} = {}", locator, locator.hashCode());
 
-        if (!engine.isPathExists(locator, pageName)) {
+        if (!engine.isPathExists(locator, pageName)) {//TODO
             log.warn("Healing canceled because no locator data exists");
             return Optional.empty();
         }
-        LocatorInfo.Entry entry = reportBasicInfo(pageName, e);
-        return healLocator(locator, pageName).map(healed -> {
+
+        Optional<StackTraceElement> traceElement = StackUtils.findOriginCaller(Thread.currentThread().getStackTrace());
+
+        LocatorInfo.Entry entry = reportBasicInfo(pageName, ex);
+        return healLocator(by, pageName, traceElement).map(healed -> {
             reportFailedInfo(locator, entry, healed);
-            engine.saveLocator(info);
+            engine.saveLocator(info);//TODO
             return delegate.findElement(healed);
         });
     }
 
-    private Optional<List<MobileElement>> heals(String locator, String pageName, NoSuchElementException e) {
+    private Optional<List<MobileElement>> heals(By by, String pageName, NoSuchElementException ex) {
+        String locator = by.toString();
         log.info("locator.hashCode of {} = {}", locator, locator.hashCode());
 
-        if (!engine.isPathExists(locator, pageName)) {
+        if (!engine.isPathExists(locator, pageName)) {//TODO
             log.warn("Healing canceled because no locator data exists");
             return Optional.empty();
         }
-        LocatorInfo.Entry entry = reportBasicInfo(pageName, e);
-        return healLocator(locator, pageName).map(healed -> {
+
+        Optional<StackTraceElement> traceElement = StackUtils.findOriginCaller(Thread.currentThread().getStackTrace());
+
+        LocatorInfo.Entry entry = reportBasicInfo(pageName, ex);
+        return healLocator(by, pageName, traceElement).map(healed -> {
             reportFailedInfo(locator, entry, healed);
-            engine.saveLocator(info);
+            engine.saveLocator(info); //TODO
             return delegate.findElements(healed);
         });
     }
@@ -252,9 +236,14 @@ public class ProxyMethodHandler implements MethodHandler {
             .findFirst();
     }
 
-    private Optional<By> healLocator(Object locator, String page) {
+    private Optional<By> healLocator(By by, String page, Optional<StackTraceElement> optionalElement) {
         log.debug("* healLocator start: " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME));
-        List<By> choices = engine.findNewLocations(locator, page, pageSource());
+        List<By> choices;
+        if (config.getBoolean("backend-integration")) {
+            choices = engine.findNewLocations(by, pageSource(), optionalElement);
+        } else {
+            choices = engine.findNewLocations(by.toString(), page, pageSource());
+        }
         Optional<By> result = choices.stream().findFirst();
         result.ifPresent(primary ->
             log.warn("Using healed locator: {}", primary.toString()));

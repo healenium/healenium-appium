@@ -13,27 +13,24 @@
 package com.epam.healenium.appium;
 
 import com.epam.healenium.appium.elementcreators.XPathCreator;
+import com.epam.healenium.client.RestClient;
 import com.epam.healenium.engine.HealException;
 import com.epam.healenium.engine.SelfHealingEngine;
 import com.epam.healenium.engine.data.PathStorage;
-import com.epam.healenium.treecomparing.DocumentParser;
-import com.epam.healenium.treecomparing.JsoupXMLParser;
-import com.epam.healenium.treecomparing.Node;
-import com.epam.healenium.treecomparing.NodeBuilder;
+import com.epam.healenium.treecomparing.*;
+import com.epam.healenium.utils.StackUtils;
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import io.appium.java_client.AppiumDriver;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A healing engine that encapsulates all the healing logic, leaving the persistence to {@link PathStorage} abstraction and elements and locators handling to the driver.
@@ -42,8 +39,22 @@ import org.openqa.selenium.WebElement;
 @SuppressWarnings("unchecked")
 public class AppiumEngine<D extends AppiumDriver> extends SelfHealingEngine<D,WebElement> {
 
+    private static final Config DEFAULT_CONFIG = ConfigFactory.systemProperties().withFallback(ConfigFactory.load("healenium.properties").withFallback(ConfigFactory.load()));
+
+    @Getter
+    private final RestClient client;
+    @Getter
+    private final Map testData = new HashMap();
+
     AppiumEngine(D driver, Config config) {
         super(driver, config);
+        Config finalizedConfig = ConfigFactory.load(config).withFallback(DEFAULT_CONFIG);
+        client = new RestClient(finalizedConfig);
+        for (Map.Entry entry: driver.getCapabilities().asMap().entrySet()) {
+            if (((String) entry.getKey()).contains("test_data")) {
+                testData.put(entry.getKey(), entry.getValue());
+            }
+        }
     }
 
     @Override
@@ -75,16 +86,57 @@ public class AppiumEngine<D extends AppiumDriver> extends SelfHealingEngine<D,We
             .collect(Collectors.toList());
     }
 
+    /**
+     * @param locator page aware locator
+     * @param targetPage the new HTML page source on which we should search for the element
+     * @return a list of candidate locators, ordered by revelance, or empty list if was unable to heal
+     */
+    public List<By> findNewLocations(By locator, String targetPage, Optional<StackTraceElement> element) {
+        List<By> result = new ArrayList<>();
+
+        element.flatMap(it -> client.getLastValidPath(locator, it))
+                // ignore empty result, or will fall on search
+                .filter(it-> !it.isEmpty())
+                .ifPresent(nodes -> findNewNodes(targetPage, nodes).stream()
+                        .map(this::toLocator)
+                        .forEach(result::add));
+        return result;
+    }
+
+    /**
+     * Stores the valid locator state: the element it found and the page.
+     *
+     * @param by         the locator
+     * @param webElement the element while it is still accessible by the locator
+     */
+
+    public void savePath(By by, WebElement webElement) {
+        StackTraceElement traceElement = StackUtils.findOriginCaller(Thread.currentThread().getStackTrace())
+                .orElseThrow(()-> new IllegalArgumentException("Failed to detect origin method caller"));
+        List<Node> nodes = getNodePath(webElement);
+        client.selectorRequest(by, traceElement, nodes);
+
+        String[] locatorParts = by.toString().split(":");
+        testData.forEach((key, value) -> {
+            if (((String) key).contains(locatorParts[1].trim())) {
+                String[] oldTestDataParts = ((String) key).split(":");
+                String[] newTestDataParts = ((String) value).split(":");
+                client.selectorRequestTest(by, traceElement, nodes, oldTestDataParts[2].trim(),
+                        newTestDataParts[1].trim(), oldTestDataParts[1].trim(), newTestDataParts[0].trim());
+            }
+        });
+    }
+
     @Override
     public DocumentParser getParser() {
         return new JsoupXMLParser();
     }
 
-    private By toLocator(Node node) {
-        log.debug("ToLocator by Node: {}", node);
-        By locator = construct(node);
+    private By toLocator(Scored<Node> scoredNode) {
+        log.debug("ToLocator by Node: {}", scoredNode.getValue());
+        By locator = construct(scoredNode.getValue());
         List<WebElement> elements = getWebDriver().findElements(locator);
-        if (elements.size() >= 1) {
+        if (elements.size() == 1) {
             return locator;
         }
         throw new HealException();
