@@ -12,7 +12,7 @@
  */
 package com.epam.healenium.appium;
 
-import com.epam.healenium.engine.data.LocatorInfo;
+import com.epam.healenium.data.LocatorInfo;
 import com.epam.healenium.utils.StackUtils;
 import com.typesafe.config.Config;
 import io.appium.java_client.AppiumDriver;

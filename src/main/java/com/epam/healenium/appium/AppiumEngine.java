@@ -14,9 +14,9 @@ package com.epam.healenium.appium;
 
 import com.epam.healenium.appium.elementcreators.XPathCreator;
 import com.epam.healenium.client.RestClient;
-import com.epam.healenium.engine.HealException;
-import com.epam.healenium.engine.SelfHealingEngine;
-import com.epam.healenium.engine.data.PathStorage;
+import com.epam.healenium.HealException;
+import com.epam.healenium.SelfHealingEngine;
+import com.epam.healenium.data.PathStorage;
 import com.epam.healenium.treecomparing.*;
 import com.epam.healenium.utils.StackUtils;
 import com.typesafe.config.Config;
@@ -33,7 +33,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * A healing engine that encapsulates all the healing logic, leaving the persistence to {@link PathStorage} abstraction and elements and locators handling to the driver.
+ * A healing com.epam.healenium.engine that encapsulates all the healing logic, leaving the persistence to {@link PathStorage} abstraction and elements and locators handling to the driver.
  */
 @Slf4j
 @SuppressWarnings("unchecked")
