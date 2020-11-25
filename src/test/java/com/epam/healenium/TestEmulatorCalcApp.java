@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.net.MalformedURLException;
@@ -46,6 +47,7 @@ public class TestEmulatorCalcApp extends AbstractBackendIT{
         dc.setCapability("appActivity", ".Calculator");
 
         dc.setCapability("test_data:testResultOk:result", "testResultHealed:resul");
+        dc.setCapability("test_data:testFindElementsOk:digit_7", "testFindElementsHealed:digit_77");
 
         //declare delegate driver
         appiumDriver = new AndroidDriver<AndroidElement>(new URL("http://127.0.0.1:4723/wd/hub"), dc);
@@ -66,6 +68,18 @@ public class TestEmulatorCalcApp extends AbstractBackendIT{
     public void testResultHealed() {
         testAddOperation();
         Assert.assertEquals(appiumDriver.findElementById("resul").getText(), "61");
+    }
+
+    @Test
+    public void testFindElementsOk() {
+        List<MobileElement> elements = appiumDriver.findElements(By.id("digit_7"));
+        Assert.assertEquals("Digit 7", "7", elements.get(0).getText());
+    }
+
+    @Test
+    public void testFindElementsHealed() {
+        List<MobileElement> elements = appiumDriver.findElements(By.id("digit_77"));
+        Assert.assertEquals("Healed digit", "7", elements.get(0).getText());
     }
 
     private void testAddOperation() {
