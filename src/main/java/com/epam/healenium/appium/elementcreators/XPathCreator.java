@@ -12,7 +12,7 @@
  */
 package com.epam.healenium.appium.elementcreators;
 
-import com.epam.healenium.engine.elementcreators.ElementCreator;
+import com.epam.healenium.elementcreators.ElementCreator;
 import com.epam.healenium.treecomparing.Node;
 import java.util.ArrayDeque;
 import java.util.Deque;
