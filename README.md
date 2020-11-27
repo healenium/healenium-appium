@@ -19,7 +19,7 @@ repositories {
     mavenCentral()
 }
 dependencies {
-    compile group: 'com.epam.healenium', name: 'healenium-appium', version: '1.0.0'
+    compile group: 'com.epam.healenium', name: 'healenium-appium', version: '1.1'
 }
 ```
 
@@ -39,7 +39,7 @@ for Maven projects:
 <dependency>
 	<groupId>com.epam.healenium</groupId>
 	<artifactId>healenium-appium</artifactId>
-	<version>1.0.0</version>
+	<version>1.1</version>
 </dependency>
 ```
 ### 1. Driver initialization
