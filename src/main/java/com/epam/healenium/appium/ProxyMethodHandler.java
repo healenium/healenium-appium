@@ -100,8 +100,10 @@ public class ProxyMethodHandler implements MethodHandler {
             try {
                 WebElement element = delegate.findElement(by);
                 if (config.getBoolean("backend-integration")) {
+                    log.info("Save locator to backend");
                     savePath(by, element);
                 } else {
+                    log.info("Save locator to file system");
                     savePath(by, page, element);
                 }
                 return element;
@@ -123,8 +125,10 @@ public class ProxyMethodHandler implements MethodHandler {
                     throw new NoSuchElementException("Failed to find an element");
                 }
                 if (config.getBoolean("backend-integration")) {
+                    log.info("Save locators to backend");
                     savePath(by, elements);
                 } else {
+                    log.info("Save locators to file system");
                     savePath(by, page, elements);
                 }
                 return elements;
@@ -161,9 +165,11 @@ public class ProxyMethodHandler implements MethodHandler {
         String locator = by.toString();
         log.info("locator.hashCode of {} = {}", locator, locator.hashCode());
 
-        if (!engine.isPathExists(locator, pageName)) {//TODO
-            log.warn("Healing canceled because no locator data exists");
-            return Optional.empty();
+        if (!config.getBoolean("backend-integration")) {
+            if (!engine.isPathExists(locator, pageName)) {//TODO
+                log.warn("Healing canceled because no locator data exists");
+                return Optional.empty();
+            }
         }
 
         Optional<StackTraceElement> traceElement = StackUtils.findOriginCaller(Thread.currentThread().getStackTrace());
@@ -171,7 +177,9 @@ public class ProxyMethodHandler implements MethodHandler {
         LocatorInfo.Entry entry = reportBasicInfo(pageName, ex);
         return healLocator(by, pageName, traceElement).map(healed -> {
             reportFailedInfo(locator, entry, healed);
-            engine.saveLocator(info);//TODO
+            if (!config.getBoolean("backend-integration")) {
+                engine.saveLocator(info);//TODO
+            }
             return delegate.findElement(healed);
         });
     }
@@ -180,9 +188,11 @@ public class ProxyMethodHandler implements MethodHandler {
         String locator = by.toString();
         log.info("locator.hashCode of {} = {}", locator, locator.hashCode());
 
-        if (!engine.isPathExists(locator, pageName)) {//TODO
-            log.warn("Healing canceled because no locator data exists");
-            return Optional.empty();
+        if (!config.getBoolean("backend-integration")) {
+            if (!engine.isPathExists(locator, pageName)) {//TODO
+                log.warn("Healing canceled because no locator data exists");
+                return Optional.empty();
+            }
         }
 
         Optional<StackTraceElement> traceElement = StackUtils.findOriginCaller(Thread.currentThread().getStackTrace());
@@ -190,7 +200,9 @@ public class ProxyMethodHandler implements MethodHandler {
         LocatorInfo.Entry entry = reportBasicInfo(pageName, ex);
         return healLocator(by, pageName, traceElement).map(healed -> {
             reportFailedInfo(locator, entry, healed);
-            engine.saveLocator(info); //TODO
+            if (!config.getBoolean("backend-integration")) {
+                engine.saveLocator(info); //TODO
+            }
             return delegate.findElements(healed);
         });
     }
