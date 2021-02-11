@@ -111,12 +111,19 @@ public class AppiumEngine<D extends AppiumDriver> extends SelfHealingEngine<D,We
      */
 
     public void savePath(By by, WebElement webElement) {
+        log.info("!!! Engine.savePath\n");
         StackTraceElement traceElement = StackUtils.findOriginCaller(Thread.currentThread().getStackTrace())
                 .orElseThrow(()-> new IllegalArgumentException("Failed to detect origin method caller"));
         List<Node> nodes = getNodePath(webElement);
         client.selectorRequest(by, traceElement, nodes);
 
         String[] locatorParts = by.toString().split(":");
+        log.info("!!! before testData size={}", testData.size());
+        /*
+         * testData format
+         * key - old data (test_data:sourceMethodName:sourceLocator)
+         * value - new data (replacementMethodName:replacementLocator)
+         */
         testData.forEach((key, value) -> {
             if (((String) key).contains(locatorParts[1].trim())) {
                 String[] oldTestDataParts = ((String) key).split(":");

@@ -118,6 +118,7 @@ public abstract class SelfHealingEngine<D,E> {
         if (nodes.isEmpty()) {
             return Collections.emptyList();
         }
+        log.info("!!! findNewNodes - nodes not empty\n");
         return findNearest(nodes.toArray(new Node[0]), targetPage);
     }
 

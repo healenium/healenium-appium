@@ -100,10 +100,10 @@ public class ProxyMethodHandler implements MethodHandler {
             try {
                 WebElement element = delegate.findElement(by);
                 if (config.getBoolean("backend-integration")) {
-                    log.info("Save locator to backend");
+                    log.info("\n* Save locator to backend *\n");
                     savePath(by, element);
                 } else {
-                    log.info("Save locator to file system");
+                    log.info("\n* Save locator to file system *\n");
                     savePath(by, page, element);
                 }
                 return element;
@@ -125,10 +125,10 @@ public class ProxyMethodHandler implements MethodHandler {
                     throw new NoSuchElementException("Failed to find an element");
                 }
                 if (config.getBoolean("backend-integration")) {
-                    log.info("Save locators to backend");
+                    log.info("\n* Save locators to backend *\n");
                     savePath(by, elements);
                 } else {
-                    log.info("Save locators to file system");
+                    log.info("\n* Save locators to file system *\n");
                     savePath(by, page, elements);
                 }
                 return elements;
@@ -201,7 +201,7 @@ public class ProxyMethodHandler implements MethodHandler {
         return healLocator(by, pageName, traceElement).map(healed -> {
             reportFailedInfo(locator, entry, healed);
             if (!config.getBoolean("backend-integration")) {
-                engine.saveLocator(info); //TODO
+                engine.saveLocator(info);//TODO
             }
             return delegate.findElements(healed);
         });
