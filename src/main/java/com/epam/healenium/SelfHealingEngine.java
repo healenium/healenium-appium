@@ -132,7 +132,7 @@ public abstract class SelfHealingEngine<D,E> {
         Node destination = parseTree(destinationTree);
         PathFinder pathFinder =
                 new PathFinder(new LCSPathDistance(), new HeuristicNodeDistance());
-        return pathFinder.find(new Path(nodePath), destination, recoveryTries, scoreCap);
+        return pathFinder.find(new Path(nodePath), destination, recoveryTries);
     }
 
     /**

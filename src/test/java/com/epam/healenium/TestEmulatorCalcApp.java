@@ -45,11 +45,11 @@ public class TestEmulatorCalcApp extends AbstractBackendIT{
         dc.setCapability("appPackage", "com.android.calculator2");
         dc.setCapability("appActivity", ".Calculator");
 
-        dc.setCapability("test_data:testResultOk:result", "testResultHealed:resul");
+        dc.setCapability("test_data:testResultOk:result", "testResultHealed:result");
         dc.setCapability("test_data:testFindElementsOk:digit_7", "testFindElementsHealed:digit_77");
 
         //declare delegate driver
-        appiumDriver = new AndroidDriver<AndroidElement>(new URL("http://127.0.0.1:4723/wd/hub"), dc);
+        appiumDriver = new AndroidDriver<AndroidElement>(new URL("http://0.0.0.0:4723/wd/hub"), dc);
 
         //adding healing support
         appiumDriver = DriverWrapper.wrap(appiumDriver);
@@ -66,7 +66,7 @@ public class TestEmulatorCalcApp extends AbstractBackendIT{
     @Test
     public void testResultHealed() {
         testAddOperation();
-        Assert.assertEquals(appiumDriver.findElementById("resul").getText(), "61");
+        Assert.assertEquals(appiumDriver.findElementById("result").getText(), "61");
     }
 
     @Test
