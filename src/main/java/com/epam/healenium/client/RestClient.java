@@ -78,10 +78,6 @@ public class RestClient {
         return mapper;
     }
 
-    /**
-     * Store info in backend
-     * @param by
-     */
     public void selectorRequest(By by, StackTraceElement element, List<Node> nodePath) {
         RequestDto requestDto = mapper.buildDto(by, element, nodePath);
         try {
@@ -96,10 +92,6 @@ public class RestClient {
         }
     }
 
-    /**
-     * Store info in backend
-     * @param by
-     */
     public void selectorRequestTest(By by, StackTraceElement element, List<Node> nodePath, String oldElement, String newElement, String oldMethod, String newMethod) {
         RequestDto requestDto = mapper.buildDto(by, element, nodePath);
         try {
@@ -119,7 +111,6 @@ public class RestClient {
      * @param locator
      * @param element
      * @param page
-     * @return
      */
     public void healRequest(By locator, StackTraceElement element, String page, List<Scored<By>> choices, Scored<By> healed, byte[] screenshot) {
         RequestDto requestDto = mapper.buildDto(locator, element, page, choices, healed, screenshot);

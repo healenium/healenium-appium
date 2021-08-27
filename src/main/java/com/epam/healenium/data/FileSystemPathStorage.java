@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *        http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,15 +15,23 @@ package com.epam.healenium.data;
 import com.epam.healenium.treecomparing.Node;
 import com.epam.healenium.treecomparing.NodeBuilder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.ObjectCodec;
+import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.core.type.WritableTypeId;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.typesafe.config.Config;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,8 +45,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class FileSystemPathStorage implements PathStorage {
-    private static final Logger LOGGER = LogManager.getLogger(FileSystemPathStorage.class);
+
     /**
      * Maximum file length usually varies, lowering to possible for most systems.
      */
@@ -74,18 +83,18 @@ public class FileSystemPathStorage implements PathStorage {
 
     @Override
     public synchronized void persistLastValidPath(Object locator, String context, List<Node> nodes) {
-        LOGGER.info("* persistLastValidPath start: " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME));
+        log.info("* persistLastValidPath start: " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME));
         Path path = getPersistedNodePath(locator, context);
         byte[] newContent;
         try {
             newContent = objectMapper.writeValueAsBytes(nodes);
             Files.write(path, newContent);
         } catch (JsonProcessingException e) {
-            LOGGER.error("Could not map the contents to JSON!", e);
+            log.error("Could not map the contents to JSON!", e);
         } catch (IOException e) {
-            LOGGER.error("Failed to persist last valid path", e);
+            log.error("Failed to persist last valid path", e);
         }
-        LOGGER.info("* persistLastValidPath finish: " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME));
+        log.info("* persistLastValidPath finish: " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME));
     }
 
     @Override
@@ -113,7 +122,7 @@ public class FileSystemPathStorage implements PathStorage {
         }
     }
 
-    public boolean isNodePathPersisted(Object locator, String context){
+    public boolean isNodePathPersisted(Object locator, String context) {
         return Files.exists(getPersistedNodePath(locator, context));
     }
 

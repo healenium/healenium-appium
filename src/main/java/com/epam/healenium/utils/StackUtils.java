@@ -30,10 +30,6 @@ import java.util.stream.Stream;
 @UtilityClass
 public class StackUtils {
 
-    /**
-     *
-     * @return
-     */
     public boolean isAnnotationPresent(Class<? extends Annotation> aClass){
         StackTraceElement[] trace = Thread.currentThread().getStackTrace();
         return findAnnotatedInTrace(trace, aClass).isPresent();
@@ -53,12 +49,6 @@ public class StackUtils {
                 .findFirst();
     }
 
-    /**
-     *
-     * @param elements
-     * @param targetClass
-     * @return
-     */
     public Optional<StackTraceElement> getElementByClass(StackTraceElement[] elements, String targetClass) {
         return Arrays.stream(elements)
                 .filter(redundantPackages())
@@ -102,10 +92,6 @@ public class StackUtils {
                 .findFirst();
     }
 
-    /**
-     *
-     * @return
-     */
     private Predicate<StackTraceElement> redundantPackages() {
         return value -> {
             Stream<String> skippingPackageStream = Stream.of("java.base","sun.reflect", "java.lang", "org.gradle", "org.junit", "java.util", "com.sun", "com.google","jdk.internal","org.openqa");

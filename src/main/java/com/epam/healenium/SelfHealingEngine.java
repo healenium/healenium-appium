@@ -51,9 +51,6 @@ public abstract class SelfHealingEngine<D,E> {
         return webDriver;
     }
 
-    /**
-     * @param config   user-defined configuration
-     */
     public SelfHealingEngine(D delegate, Config config) {
         this.webDriver = delegate;
         this.config = config;
