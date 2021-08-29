@@ -1,7 +1,7 @@
 # healenium-appium
 appium adaptor for self-healing
 
-[ ![Download](https://api.bintray.com/packages/epam/healenium/healenium-appium/images/download.svg) ](https://bintray.com/epam/healenium/healenium-appium/_latestVersion)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.epam.healenium/healenium-appium/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.epam.healenium/healenium-appium/)
 [![Build Status](https://github.com/healenium/healenium-appium/workflows/Java-CI-test/badge.svg)](https://github.com/healenium/healenium-appium/workflows/Java-CI-test/badge.svg)
 
 ## How to start
