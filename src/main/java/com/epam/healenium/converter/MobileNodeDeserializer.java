@@ -12,7 +12,7 @@
  */
 package com.epam.healenium.converter;
 
-import com.epam.healenium.FieldName;
+import com.epam.healenium.MobileFieldName;
 import com.epam.healenium.treecomparing.Node;
 import com.epam.healenium.treecomparing.NodeBuilder;
 import com.fasterxml.jackson.core.JsonParser;
@@ -25,20 +25,20 @@ import java.io.IOException;
 import java.util.Map;
 
 @SuppressWarnings("unchecked")
-public class NodeDeserializer extends JsonDeserializer<Node> {
+public class MobileNodeDeserializer extends JsonDeserializer<Node> {
 
     @Override
     public Node deserialize(JsonParser parser, DeserializationContext ctxt) throws IOException {
         ObjectCodec codec = parser.getCodec();
         TreeNode tree = parser.readValueAsTree();
-        String tag = codec.treeToValue(tree.path(FieldName.TAG), String.class);
-        Integer index = codec.treeToValue(tree.path(FieldName.INDEX), Integer.class);
-        String innerText = codec.treeToValue(tree.path(FieldName.INNER_TEXT), String.class);
-        String id = codec.treeToValue(tree.path(FieldName.ID), String.class);
-        String classes = codec.treeToValue(tree.path(FieldName.CLASSES), String.class);
-        Map<String, String> attributes = codec.treeToValue(tree.path(FieldName.OTHER), Map.class);
-        attributes.put(FieldName.ID, id);
-        attributes.put(FieldName.CLASS, classes);
+        String tag = codec.treeToValue(tree.path(MobileFieldName.TAG), String.class);
+        Integer index = codec.treeToValue(tree.path(MobileFieldName.INDEX), Integer.class);
+        String innerText = codec.treeToValue(tree.path(MobileFieldName.INNER_TEXT), String.class);
+        String id = codec.treeToValue(tree.path(MobileFieldName.ID), String.class);
+        String classes = codec.treeToValue(tree.path(MobileFieldName.CLASSES), String.class);
+        Map<String, String> attributes = codec.treeToValue(tree.path(MobileFieldName.OTHER), Map.class);
+        attributes.put(MobileFieldName.ID, id);
+        attributes.put(MobileFieldName.CLASS, classes);
         return new NodeBuilder()
                 .setTag(tag)
                 .setIndex(index)

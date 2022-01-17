@@ -21,7 +21,7 @@ import java.net.UnknownHostException;
 
 @Slf4j
 @UtilityClass
-public class SystemUtils {
+public class MobileSystemUtils {
     
     public String getHostProjectName() {
         String projectPath = System.getProperty("user.dir").replace("\\", "/");

@@ -12,7 +12,7 @@
  */
 package com.epam.healenium.converter;
 
-import com.epam.healenium.FieldName;
+import com.epam.healenium.MobileFieldName;
 import com.epam.healenium.treecomparing.Node;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonToken;
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 
 import java.io.IOException;
 
-public class NodeSerializer extends JsonSerializer<Node> {
+public class MobileNodeSerializer extends JsonSerializer<Node> {
 
     @Override
     public void serializeWithType(Node value, JsonGenerator gen, SerializerProvider serializers, TypeSerializer typeSer) throws IOException {
@@ -36,12 +36,12 @@ public class NodeSerializer extends JsonSerializer<Node> {
     @Override
     public void serialize(Node value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         gen.writeStartObject();
-        gen.writeStringField(FieldName.TAG, value.getTag());
-        gen.writeNumberField(FieldName.INDEX, value.getIndex());
-        gen.writeStringField(FieldName.INNER_TEXT, value.getInnerText());
-        gen.writeStringField(FieldName.ID, value.getId());
-        gen.writeStringField(FieldName.CLASSES, String.join(" ", value.getClasses()));
-        gen.writeObjectField(FieldName.OTHER, value.getOtherAttributes());
+        gen.writeStringField(MobileFieldName.TAG, value.getTag());
+        gen.writeNumberField(MobileFieldName.INDEX, value.getIndex());
+        gen.writeStringField(MobileFieldName.INNER_TEXT, value.getInnerText());
+        gen.writeStringField(MobileFieldName.ID, value.getId());
+        gen.writeStringField(MobileFieldName.CLASSES, String.join(" ", value.getClasses()));
+        gen.writeObjectField(MobileFieldName.OTHER, value.getOtherAttributes());
         gen.writeEndObject();
         gen.flush();
     }

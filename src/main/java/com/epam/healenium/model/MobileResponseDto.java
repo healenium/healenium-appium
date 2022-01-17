@@ -10,14 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.epam.healenium.annotation;
+package com.epam.healenium.model;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.epam.healenium.treecomparing.Node;
+import lombok.Data;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD})
-public @interface DisableHealing {
+import java.util.Collections;
+import java.util.List;
+
+@Data
+public class MobileResponseDto {
+
+    private List<Node> nodePath = Collections.emptyList();
+
 }

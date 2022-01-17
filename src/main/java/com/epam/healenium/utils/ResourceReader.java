@@ -12,7 +12,7 @@
  */
 package com.epam.healenium.utils;
 
-import com.epam.healenium.SelfHealingEngine;
+import com.epam.healenium.MobileSelfHealingEngine;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 public class ResourceReader {
 
     public static <T> T readResource(String classpath, Function<Stream<String>, T> function) {
-        ClassLoader classLoader = SelfHealingEngine.class.getClassLoader();
+        ClassLoader classLoader = MobileSelfHealingEngine.class.getClassLoader();
         try (InputStream stream = classLoader.getResourceAsStream(classpath)) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
             return function.apply(reader.lines());

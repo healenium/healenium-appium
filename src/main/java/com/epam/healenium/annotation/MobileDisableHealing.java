@@ -10,15 +10,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.epam.healenium;
+package com.epam.healenium.annotation;
 
-public class FieldName {
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-    public static final String TAG = "tag";
-    public static final String INDEX = "index";
-    public static final String INNER_TEXT = "innerText";
-    public static final String ID = "id";
-    public static final String CLASSES = "classes";
-    public static final String CLASS = "class";
-    public static final String OTHER = "other";
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.METHOD})
+public @interface MobileDisableHealing {
 }

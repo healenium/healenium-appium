@@ -32,7 +32,8 @@ public class XPathCreator implements ElementCreator {
             String item = current.getTag();
             String id = current.getId();
             String resourceId = current.getOtherAttributes().getOrDefault("resource-id", "");
-            String text = current.getOtherAttributes().getOrDefault("text", "");
+//            String text = current.getOtherAttributes().getOrDefault("text", "");
+            String text = current.getInnerText();
             String contentDesc = current.getOtherAttributes().getOrDefault("content-desc", "");
             if (!StringUtils.isEmpty(id)) {
                 item += "[@id = '" + id + "']";

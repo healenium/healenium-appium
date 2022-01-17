@@ -12,14 +12,14 @@
  */
 package com.epam.healenium.client;
 
-import com.epam.healenium.converter.NodeDeserializer;
-import com.epam.healenium.converter.NodeSerializer;
-import com.epam.healenium.mapper.HealeniumMapper;
-import com.epam.healenium.mapper.HealeniumMapperImpl;
-import com.epam.healenium.model.RequestDto;
+import com.epam.healenium.converter.MobileNodeDeserializer;
+import com.epam.healenium.converter.MobileNodeSerializer;
+import com.epam.healenium.mapper.MobileHealeniumMapper;
+import com.epam.healenium.mapper.MobileHealeniumMapperImpl;
+import com.epam.healenium.model.MobileRequestDto;
 import com.epam.healenium.treecomparing.Node;
 import com.epam.healenium.treecomparing.Scored;
-import com.epam.healenium.utils.SystemUtils;
+import com.epam.healenium.utils.MobileSystemUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,19 +45,19 @@ import java.util.concurrent.TimeUnit;
  */
 
 @Slf4j
-public class RestClient {
+public class MobileRestClient {
 
     private final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private final String baseUrl;
     private final String sessionKey;
     private final ObjectMapper objectMapper;
-    private final HealeniumMapper mapper;
+    private final MobileHealeniumMapper mapper;
 
-    public RestClient(Config config) {
+    public MobileRestClient(Config config) {
         objectMapper = initMapper();
         baseUrl = "http://" + config.getString("serverHost") + ":" + config.getInt("serverPort") + "/healenium";
         sessionKey = config.hasPath("sessionKey") ? config.getString("sessionKey") : "";
-        mapper = new HealeniumMapperImpl();
+        mapper = new MobileHealeniumMapperImpl();
     }
 
     private OkHttpClient okHttpClient() {
@@ -70,8 +70,8 @@ public class RestClient {
 
     private ObjectMapper initMapper() {
         SimpleModule module = new SimpleModule("node");
-        module.addSerializer(Node.class, new NodeSerializer());
-        module.addDeserializer(Node.class, new NodeDeserializer());
+        module.addSerializer(Node.class, new MobileNodeSerializer());
+        module.addDeserializer(Node.class, new MobileNodeDeserializer());
         ObjectMapper mapper = new ObjectMapper().registerModule(module);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
@@ -79,9 +79,9 @@ public class RestClient {
     }
 
     public void selectorRequest(By by, StackTraceElement element, List<Node> nodePath) {
-        RequestDto requestDto = mapper.buildDto(by, element, nodePath);
+        MobileRequestDto mobileRequestDto = mapper.buildDto(by, element, nodePath);
         try {
-            RequestBody body = RequestBody.create(JSON, objectMapper.writeValueAsString(requestDto));
+            RequestBody body = RequestBody.create(JSON, objectMapper.writeValueAsString(mobileRequestDto));
             Request request = new Request.Builder()
                     .url(baseUrl)
                     .post(body)
@@ -93,9 +93,9 @@ public class RestClient {
     }
 
     public void selectorRequestTest(By by, StackTraceElement element, List<Node> nodePath, String oldElement, String newElement, String oldMethod, String newMethod) {
-        RequestDto requestDto = mapper.buildDto(by, element, nodePath);
+        MobileRequestDto mobileRequestDto = mapper.buildDto(by, element, nodePath);
         try {
-            RequestBody body = RequestBody.create(JSON, objectMapper.writeValueAsString(requestDto).replace(oldElement, newElement).replace(oldMethod, newMethod));
+            RequestBody body = RequestBody.create(JSON, objectMapper.writeValueAsString(mobileRequestDto).replace(oldElement, newElement).replace(oldMethod, newMethod));
             Request request = new Request.Builder()
                     .url(baseUrl)
                     .post(body)
@@ -113,17 +113,17 @@ public class RestClient {
      * @param page
      */
     public void healRequest(By locator, StackTraceElement element, String page, List<Scored<By>> choices, Scored<By> healed, byte[] screenshot) {
-        RequestDto requestDto = mapper.buildDto(locator, element, page, choices, healed, screenshot);
+        MobileRequestDto mobileRequestDto = mapper.buildDto(locator, element, page, choices, healed, screenshot);
         try {
             RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                     .addFormDataPart("screenshot", buildScreenshotName(), RequestBody.create(MediaType.parse("image/png"), screenshot))
-                    .addFormDataPart("dto", objectMapper.writeValueAsString(requestDto))
+                    .addFormDataPart("dto", objectMapper.writeValueAsString(mobileRequestDto))
                     .build();
 
             Request request = new Request.Builder()
                     .addHeader("sessionKey", sessionKey)
-                    .addHeader("instance", SystemUtils.getHostIpAddress())
-                    .addHeader("hostProject", SystemUtils.getHostProjectName())
+                    .addHeader("instance", MobileSystemUtils.getHostIpAddress())
+                    .addHeader("hostProject", MobileSystemUtils.getHostProjectName())
                     .url(baseUrl + "/healing")
                     .post(requestBody)
                     .build();
@@ -141,12 +141,12 @@ public class RestClient {
      */
     public Optional<List<Node>> getLastValidPath(By locator, StackTraceElement element) {
         List<Node> nodes = null;
-        RequestDto requestDto = mapper.buildDto(locator, element);
+        MobileRequestDto mobileRequestDto = mapper.buildDto(locator, element);
         try {
             HttpUrl.Builder httpBuilder = HttpUrl.parse(baseUrl).newBuilder()
-                    .addQueryParameter("locator", requestDto.getLocator())
-                    .addQueryParameter("className", requestDto.getClassName())
-                    .addQueryParameter("methodName", requestDto.getMethodName());
+                    .addQueryParameter("locator", mobileRequestDto.getLocator())
+                    .addQueryParameter("className", mobileRequestDto.getClassName())
+                    .addQueryParameter("methodName", mobileRequestDto.getMethodName());
             Request request = new Request.Builder()
                     .addHeader("sessionKey", sessionKey)
                     .url(httpBuilder.build())

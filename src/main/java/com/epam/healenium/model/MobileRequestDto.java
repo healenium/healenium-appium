@@ -12,16 +12,29 @@
  */
 package com.epam.healenium.model;
 
-import lombok.AllArgsConstructor;
+import com.epam.healenium.treecomparing.Node;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
+import java.util.Collections;
+import java.util.List;
+
+@Accessors(chain = true)
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class Locator {
+public class MobileRequestDto {
 
-    private String value;
+    // currently used selector
+    private String locator;
     private String type;
-
+    private String className;
+    private String methodName;
+    // page where search was performed
+    private String pageContent;
+    // searched element path
+    private List<Node> nodePath = Collections.emptyList();
+    // healed selectors
+    private List<MobileHealingResultDto> results;
+    // used selector for healing
+    private MobileHealingResultDto usedResult;
+    private byte[] screenshot;
 }

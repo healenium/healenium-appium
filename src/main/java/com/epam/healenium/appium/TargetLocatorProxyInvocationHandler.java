@@ -23,9 +23,9 @@ import org.openqa.selenium.WebDriver.TargetLocator;
 class TargetLocatorProxyInvocationHandler implements InvocationHandler {
 
     private final TargetLocator delegate;
-    private final AppiumEngine engine;
+    private final AppiumEngineMobile engine;
 
-    TargetLocatorProxyInvocationHandler(TargetLocator delegate, AppiumEngine engine) {
+    TargetLocatorProxyInvocationHandler(TargetLocator delegate, AppiumEngineMobile engine) {
         this.delegate = delegate;
         this.engine = engine;
     }
@@ -36,7 +36,7 @@ class TargetLocatorProxyInvocationHandler implements InvocationHandler {
         boolean isProxy = result instanceof DriverWrapper;
         boolean isWebDriver = result instanceof WebDriver;
         if (isWebDriver && !isProxy) {
-            return DriverWrapper.create(engine);
+            return DriverWrapper.create(null);
         } else {
             return result;
         }

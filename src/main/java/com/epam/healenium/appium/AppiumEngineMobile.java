@@ -13,12 +13,12 @@
 package com.epam.healenium.appium;
 
 import com.epam.healenium.appium.elementcreators.XPathCreator;
-import com.epam.healenium.client.RestClient;
+import com.epam.healenium.client.MobileRestClient;
 import com.epam.healenium.HealException;
-import com.epam.healenium.SelfHealingEngine;
+import com.epam.healenium.MobileSelfHealingEngine;
 import com.epam.healenium.data.PathStorage;
 import com.epam.healenium.treecomparing.*;
-import com.epam.healenium.utils.StackUtils;
+import com.epam.healenium.utils.MobileStackUtils;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.appium.java_client.AppiumDriver;
@@ -37,19 +37,19 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @SuppressWarnings("unchecked")
-public class AppiumEngine<D extends AppiumDriver> extends SelfHealingEngine<D,WebElement> {
+public class AppiumEngineMobile<D extends AppiumDriver> extends MobileSelfHealingEngine<D,WebElement> {
 
     private static final Config DEFAULT_CONFIG = ConfigFactory.systemProperties().withFallback(ConfigFactory.load("healenium.properties").withFallback(ConfigFactory.load()));
 
     @Getter
-    private final RestClient client;
+    private final MobileRestClient client;
     @Getter
     private final Map testData = new HashMap();
 
-    AppiumEngine(D driver, Config config) {
+    AppiumEngineMobile(D driver, Config config) {
         super(driver, config);
         Config finalizedConfig = ConfigFactory.load(config).withFallback(DEFAULT_CONFIG);
-        client = new RestClient(finalizedConfig);
+        client = new MobileRestClient(finalizedConfig);
         for (Map.Entry entry: driver.getCapabilities().asMap().entrySet()) {
             if (((String) entry.getKey()).contains("test_data")) {
                 testData.put(entry.getKey(), entry.getValue());
@@ -67,12 +67,33 @@ public class AppiumEngine<D extends AppiumDriver> extends SelfHealingEngine<D,We
         log.debug("* getNodePath start: " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME));
         List<Node> path = new LinkedList<>();
 
-        String ancestorsXPath = element.toString().substring(element.toString().lastIndexOf(":") + 1, element.toString().length() - 1) + "/ancestor::*";
-        List<WebElement> ancestors = getWebDriver().findElements(By.xpath(ancestorsXPath));
-        ancestors.add(element);
+        List<WebElement> ancestors = getHierarchyElements(element);
+
+
+//        String ancestorsXPath = element.toString().substring(element.toString().lastIndexOf(":") + 1, element.toString().length() - 1) + "/ancestor::*";
+//        List<WebElement> ancestors = getWebDriver().findElements(By.xpath(ancestorsXPath));
+//        ancestors.add(element);
         ancestors.forEach(it -> path.add(toNode(it)));
         log.debug("* getNodePath finish: " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME));
         return path;
+    }
+
+    private List<WebElement> getHierarchyElements(WebElement element) {
+        Node node = toNode(element);
+        String xPath = new XPathCreator().create(node);
+        List<WebElement> webElements = new ArrayList<>();
+        webElements.add(element);
+        boolean hasNext = true;
+        while (hasNext) {
+            xPath = xPath.concat("/..");
+            try {
+                WebElement element1 = getWebDriver().findElement(By.xpath(xPath));
+                webElements.add(element1);
+            } catch (Exception e) {
+                hasNext = false;
+            }
+        }
+        return webElements;
     }
 
     /**
@@ -112,7 +133,7 @@ public class AppiumEngine<D extends AppiumDriver> extends SelfHealingEngine<D,We
 
     public void savePath(By by, WebElement webElement) {
         log.info("!!! Engine.savePath\n");
-        StackTraceElement traceElement = StackUtils.findOriginCaller(Thread.currentThread().getStackTrace())
+        StackTraceElement traceElement = MobileStackUtils.findOriginCaller(Thread.currentThread().getStackTrace())
                 .orElseThrow(()-> new IllegalArgumentException("Failed to detect origin method caller"));
         List<Node> nodes = getNodePath(webElement);
         client.selectorRequest(by, traceElement, nodes);

@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 
 @Slf4j
 @UtilityClass
-public class StackUtils {
+public class MobileStackUtils {
 
     public boolean isAnnotationPresent(Class<? extends Annotation> aClass){
         StackTraceElement[] trace = Thread.currentThread().getStackTrace();

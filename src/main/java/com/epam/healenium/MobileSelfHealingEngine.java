@@ -32,7 +32,7 @@ import java.util.List;
  * and elements and locators handling to the driver.
  */
 @Slf4j
-public abstract class SelfHealingEngine<D,E> {
+public abstract class MobileSelfHealingEngine<D,E> {
 
     /**
      * A JavaScript source to extract an HTML item with its attributes
@@ -51,7 +51,7 @@ public abstract class SelfHealingEngine<D,E> {
         return webDriver;
     }
 
-    public SelfHealingEngine(D delegate, Config config) {
+    public MobileSelfHealingEngine(D delegate, Config config) {
         this.webDriver = delegate;
         this.config = config;
         this.storage = new FileSystemPathStorage(config);

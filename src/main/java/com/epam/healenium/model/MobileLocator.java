@@ -12,15 +12,16 @@
  */
 package com.epam.healenium.model;
 
-import com.epam.healenium.treecomparing.Node;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.Collections;
-import java.util.List;
+import lombok.NoArgsConstructor;
 
 @Data
-public class ResponseDto {
+@AllArgsConstructor
+@NoArgsConstructor
+public class MobileLocator {
 
-    private List<Node> nodePath = Collections.emptyList();
+    private String value;
+    private String type;
 
 }

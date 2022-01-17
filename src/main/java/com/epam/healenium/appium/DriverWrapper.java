@@ -12,6 +12,9 @@
  */
 package com.epam.healenium.appium;
 
+
+import com.epam.healenium.SelfHealingEngine;
+import com.epam.healenium.mapper.HealeniumMapper;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.appium.java_client.AppiumDriver;
@@ -42,30 +45,56 @@ public final class DriverWrapper {
         if(config == null){
             config = ConfigFactory.systemProperties().withFallback(ConfigFactory.load());
         }
-        AppiumEngine<T> engine = new AppiumEngine<>(delegate, config);
+//        AppiumEngine<T> engine = new AppiumEngine<>(delegate, config);
+        SelfHealingEngine engine = new MobSelfHealingEngine(delegate, config);
+        engine.setNodeService(new MobileNodeService(delegate));
+        engine.setHealingService(new MobileHealingService(config, delegate));
+        engine.getClient().setMapper(new HealeniumMapper(new MobileStackTraceReader()));
         return create(engine);
     }
 
-    static <T extends AppiumDriver> T create(AppiumEngine engine){
+    static <T extends AppiumDriver> T create(SelfHealingEngine engine){
         T origin = (T) engine.getWebDriver();
         try{
             ProxyFactory factory = new ProxyFactory();
             factory.setSuperclass(origin.getClass());
             factory.setFilter(
-                method -> {
-                    String methodName = method.getName();
-                    return methodName.startsWith("findElement") || methodName.equalsIgnoreCase("switchTo");
-                }
+                    method -> {
+                        String methodName = method.getName();
+                        return methodName.startsWith("findElement") || methodName.equalsIgnoreCase("switchTo");
+                    }
             );
             return (T) factory.create(
-                new Class<?>[]{URL.class, Capabilities.class},
-                new Object[]{origin.getRemoteAddress(), origin.getCapabilities()},
-                new ProxyMethodHandler(engine)
+                    new Class<?>[]{URL.class, Capabilities.class},
+                    new Object[]{origin.getRemoteAddress(), origin.getCapabilities()},
+                    new ProxyMethodHandler(engine)
             );
         } catch (Exception ex){
             log.error("Failed to create wrapper!", ex);
             return origin;
         }
     }
+
+//    static <T extends AppiumDriver> T create(AppiumEngineMobile engine){
+//        T origin = (T) engine.getWebDriver();
+//        try{
+//            ProxyFactory factory = new ProxyFactory();
+//            factory.setSuperclass(origin.getClass());
+//            factory.setFilter(
+//                method -> {
+//                    String methodName = method.getName();
+//                    return methodName.startsWith("findElement") || methodName.equalsIgnoreCase("switchTo");
+//                }
+//            );
+//            return (T) factory.create(
+//                new Class<?>[]{URL.class, Capabilities.class},
+//                new Object[]{origin.getRemoteAddress(), origin.getCapabilities()},
+//                new ProxyMethodHandler(engine)
+//            );
+//        } catch (Exception ex){
+//            log.error("Failed to create wrapper!", ex);
+//            return origin;
+//        }
+//    }
 
 }
