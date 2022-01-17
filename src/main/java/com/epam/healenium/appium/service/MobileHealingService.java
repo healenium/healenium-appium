@@ -1,4 +1,4 @@
-package com.epam.healenium.appium;
+package com.epam.healenium.appium.service;
 
 import com.epam.healenium.SelectorComponent;
 import com.epam.healenium.appium.elementcreators.XPathCreator;

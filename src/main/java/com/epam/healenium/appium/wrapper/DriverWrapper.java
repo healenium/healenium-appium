@@ -10,10 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.epam.healenium.appium;
+package com.epam.healenium.appium.wrapper;
 
 
 import com.epam.healenium.SelfHealingEngine;
+import com.epam.healenium.appium.MobSelfHealingEngine;
+import com.epam.healenium.appium.utils.MobileStackTraceReader;
+import com.epam.healenium.appium.handlers.proxy.MobileSelfHealingProxyInvocationHandler;
+import com.epam.healenium.appium.service.MobileHealingService;
+import com.epam.healenium.appium.service.MobileNodeService;
 import com.epam.healenium.mapper.HealeniumMapper;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -45,7 +50,6 @@ public final class DriverWrapper {
         if(config == null){
             config = ConfigFactory.systemProperties().withFallback(ConfigFactory.load());
         }
-//        AppiumEngine<T> engine = new AppiumEngine<>(delegate, config);
         SelfHealingEngine engine = new MobSelfHealingEngine(delegate, config);
         engine.setNodeService(new MobileNodeService(delegate));
         engine.setHealingService(new MobileHealingService(config, delegate));
@@ -53,48 +57,22 @@ public final class DriverWrapper {
         return create(engine);
     }
 
-    static <T extends AppiumDriver> T create(SelfHealingEngine engine){
+    public static <T extends AppiumDriver> T create(SelfHealingEngine engine){
         T origin = (T) engine.getWebDriver();
         try{
             ProxyFactory factory = new ProxyFactory();
             factory.setSuperclass(origin.getClass());
-            factory.setFilter(
-                    method -> {
-                        String methodName = method.getName();
-                        return methodName.startsWith("findElement") || methodName.equalsIgnoreCase("switchTo");
-                    }
-            );
+            factory.setFilter(method -> method.getName().startsWith("findElement")
+                    || method.getName().equalsIgnoreCase("switchTo"));
             return (T) factory.create(
                     new Class<?>[]{URL.class, Capabilities.class},
                     new Object[]{origin.getRemoteAddress(), origin.getCapabilities()},
-                    new ProxyMethodHandler(engine)
+                    new MobileSelfHealingProxyInvocationHandler(engine)
             );
         } catch (Exception ex){
             log.error("Failed to create wrapper!", ex);
             return origin;
         }
     }
-
-//    static <T extends AppiumDriver> T create(AppiumEngineMobile engine){
-//        T origin = (T) engine.getWebDriver();
-//        try{
-//            ProxyFactory factory = new ProxyFactory();
-//            factory.setSuperclass(origin.getClass());
-//            factory.setFilter(
-//                method -> {
-//                    String methodName = method.getName();
-//                    return methodName.startsWith("findElement") || methodName.equalsIgnoreCase("switchTo");
-//                }
-//            );
-//            return (T) factory.create(
-//                new Class<?>[]{URL.class, Capabilities.class},
-//                new Object[]{origin.getRemoteAddress(), origin.getCapabilities()},
-//                new ProxyMethodHandler(engine)
-//            );
-//        } catch (Exception ex){
-//            log.error("Failed to create wrapper!", ex);
-//            return origin;
-//        }
-//    }
 
 }

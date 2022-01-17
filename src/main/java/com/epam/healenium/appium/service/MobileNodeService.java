@@ -1,12 +1,10 @@
-package com.epam.healenium.appium;
+package com.epam.healenium.appium.service;
 
 import com.epam.healenium.appium.elementcreators.XPathCreator;
 import com.epam.healenium.service.NodeService;
 import com.epam.healenium.treecomparing.Node;
 import com.epam.healenium.treecomparing.NodeBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.compress.utils.Lists;
-import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -58,7 +56,6 @@ public class MobileNodeService extends NodeService {
         Collections.reverse(webElements);
         return webElements;
     }
-
 
     private Node toNode(WebElement element) {
         Map<String, String> otherAttributes = new HashMap<>();
