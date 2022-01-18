@@ -6,6 +6,8 @@ import com.epam.healenium.treecomparing.Node;
 import com.typesafe.config.Config;
 import io.appium.java_client.AppiumDriver;
 import org.jetbrains.annotations.NotNull;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -36,6 +38,6 @@ public class MobSelfHealingEngine extends SelfHealingEngine {
 
     @Override
     public byte[] captureScreen(WebElement element) {
-        return null;
+        return  ((TakesScreenshot) getWebDriver()).getScreenshotAs(OutputType.BYTES);
     }
 }
