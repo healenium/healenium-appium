@@ -14,9 +14,9 @@ import org.openqa.selenium.WebElement;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 
-public class MobSelfHealingEngine extends SelfHealingEngine {
+public class MobileSelfHealingEngine extends SelfHealingEngine {
 
-    public MobSelfHealingEngine(@NotNull WebDriver delegate, @NotNull Config config) {
+    public MobileSelfHealingEngine(@NotNull WebDriver delegate, @NotNull Config config) {
         super(delegate, config);
     }
 

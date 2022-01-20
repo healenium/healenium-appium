@@ -14,7 +14,7 @@ package com.epam.healenium.appium.wrapper;
 
 
 import com.epam.healenium.SelfHealingEngine;
-import com.epam.healenium.appium.MobSelfHealingEngine;
+import com.epam.healenium.appium.MobileSelfHealingEngine;
 import com.epam.healenium.appium.utils.MobileStackTraceReader;
 import com.epam.healenium.appium.handlers.proxy.MobileSelfHealingProxyInvocationHandler;
 import com.epam.healenium.appium.service.MobileHealingService;
@@ -50,7 +50,7 @@ public final class DriverWrapper {
         if(config == null){
             config = ConfigFactory.systemProperties().withFallback(ConfigFactory.load());
         }
-        SelfHealingEngine engine = new MobSelfHealingEngine(delegate, config);
+        SelfHealingEngine engine = new MobileSelfHealingEngine(delegate, config);
         engine.setNodeService(new MobileNodeService(delegate));
         engine.setHealingService(new MobileHealingService(config, delegate));
         engine.getClient().setMapper(new HealeniumMapper(new MobileStackTraceReader()));
