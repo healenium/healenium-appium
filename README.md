@@ -6,7 +6,7 @@ appium adaptor for self-healing
 
 ## How to start
 
-### 0. For version 1.2 and higher start hlm-backend by [instruction](https://github.com/healenium/healenium-backend) 
+### 0. For version 1.2.2 and higher start hlm-backend by [instruction](https://github.com/healenium/healenium-backend) 
 
 ### 0.1 Add dependency 
 
