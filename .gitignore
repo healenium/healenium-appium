@@ -1,34 +1,23 @@
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
 *.war
+*.nar
 *.ear
 *.zip
-*.iml
-*.pydevproject
-.project
-.metadata
-.svn/
-target/
-build/
-classes/
-/drivers/
-.gradle/
-bin/**
-tmp/**
-tmp/**/*
-*.tmp
-*.bak
-local.properties
-.classpath
-.settings/
-.loadpath
+*.tar.gz
+*.rar
 
-# Locally stored "Eclipse launch configurations"
-*.launch
-
-.idea/
-.idea
-*.classpath
-*.project
-*.settings
-
-out/
-.DS_Store
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
