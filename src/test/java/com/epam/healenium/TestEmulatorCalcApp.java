@@ -11,7 +11,7 @@ package com.epam.healenium; /**
  * limitations under the License.
  */
 
-import com.epam.healenium.appium.DriverWrapper;
+import com.epam.healenium.appium.wrapper.DriverWrapper;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;

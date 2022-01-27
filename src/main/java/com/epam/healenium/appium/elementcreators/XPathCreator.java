@@ -12,7 +12,6 @@
  */
 package com.epam.healenium.appium.elementcreators;
 
-import com.epam.healenium.elementcreators.ElementCreator;
 import com.epam.healenium.treecomparing.Node;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -32,7 +31,7 @@ public class XPathCreator implements ElementCreator {
             String item = current.getTag();
             String id = current.getId();
             String resourceId = current.getOtherAttributes().getOrDefault("resource-id", "");
-            String text = current.getOtherAttributes().getOrDefault("text", "");
+            String text = current.getInnerText();
             String contentDesc = current.getOtherAttributes().getOrDefault("content-desc", "");
             if (!StringUtils.isEmpty(id)) {
                 item += "[@id = '" + id + "']";

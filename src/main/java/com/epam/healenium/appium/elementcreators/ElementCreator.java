@@ -10,18 +10,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.epam.healenium.model;
+package com.epam.healenium.appium.elementcreators;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.epam.healenium.treecomparing.Node;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class HealingResultDto {
-
-    private Locator locator;
-    private Double score;
-
+public interface ElementCreator {
+    String create(Node node);
 }
