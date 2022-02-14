@@ -52,16 +52,16 @@ public class MobileNodeService extends NodeService {
 
         while (currentElementInDoc.hasParent()) {
             Node currentNode = toNode(currentElementInDoc);
-            list.add(0, currentNode);
+            list.add(currentNode);
             currentElementInDoc = currentElementInDoc.parent();
         }
-
+        Collections.reverse(list);
         return new LinkedList<>(list);
     }
 
     private Element getElementFromDoc(Document doc, WebElement webElement) {
-        List<String> paramsList = Arrays.asList("resource-id", "content-desc", "text", "checked", "enabled",
-                "selected", "focused", "displayed", "class", "bounds");
+        List<String> paramsList = Arrays.asList("resource-id", "content-desc", "text", "class", "bounds", "checked",
+                "enabled", "selected", "focused", "displayed");
 
         List<Element> tempElements = new ArrayList<>(doc.getAllElements());
         Iterator<String> it = paramsList.iterator();
