@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.epam.healenium</groupId>
     <artifactId>healenium-appium</artifactId>
-    <version>1.2.2</version>
+    <version>1.2.3</version>
     <packaging>jar</packaging>
     <name>healenium-appium</name>
     <description>healenium appium client</description>
@@ -79,7 +79,7 @@
         <javassist.version>3.26.0-GA</javassist.version>
         <junit.version>5.7.1</junit.version>
         <appium.version>7.3.0</appium.version>
-        <healenium.version>3.2.2</healenium.version>
+        <healenium.version>3.2.3</healenium.version>
         <okhttp3.version>4.9.3</okhttp3.version>
     </properties>
 
@@ -231,7 +231,6 @@
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
             <version>${selenium.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
