@@ -60,14 +60,12 @@ for Maven projects:
  be used when backend-integration set to 'false'.
  Default config values:
 ``` 
-    recovery-tries = 1
-    basePath = sha/healenium
-    reportPath = build/reports
-    screenshotPath = build/screenshots/
-    heal-enabled = true
-    backend-integration = true
-    serverHost = localhost
-    serverPort = 7878
+	recovery-tries = 1
+	score-cap = 0.5
+	heal-enabled = true
+	serverHost = localhost
+	serverPort = 7878
+	imitatePort = 8000
  ```
 
  > recovery-tries - list of proposed healed locators
