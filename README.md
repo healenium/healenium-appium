@@ -60,7 +60,7 @@ for Maven projects:
  be used when backend-integration set to 'false'.
  Default config values:
 ``` 
-    recovery-tries = 3
+    recovery-tries = 1
     basePath = sha/healenium
     reportPath = build/reports
     screenshotPath = build/screenshots/
