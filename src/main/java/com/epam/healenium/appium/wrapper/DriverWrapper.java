@@ -19,9 +19,11 @@ import com.epam.healenium.appium.utils.MobileStackTraceReader;
 import com.epam.healenium.appium.handlers.proxy.MobileSelfHealingProxyInvocationHandler;
 import com.epam.healenium.appium.service.MobileHealingService;
 import com.epam.healenium.appium.service.MobileNodeService;
+import com.epam.healenium.client.RestClient;
 import com.epam.healenium.mapper.HealeniumMapper;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigValueFactory;
 import io.appium.java_client.AppiumDriver;
 import java.net.URL;
 import javassist.util.proxy.ProxyFactory;
@@ -48,11 +50,14 @@ public final class DriverWrapper {
 
     public static <T extends AppiumDriver> T wrap(T delegate, Config config) {
         if(config == null){
-            config = ConfigFactory.systemProperties().withFallback(ConfigFactory.load());
+            config = ConfigFactory.systemProperties()
+                    .withValue("proxy", ConfigValueFactory.fromAnyRef(true))
+                    .withFallback(ConfigFactory.load());
         }
         SelfHealingEngine engine = new MobileSelfHealingEngine(delegate, config);
+        engine.setClient(new RestClient(engine.getConfig()));
         engine.setNodeService(new MobileNodeService(delegate));
-        engine.setHealingService(new MobileHealingService(config, delegate));
+        engine.setHealingService(new MobileHealingService(engine.getConfig(), delegate));
         engine.getClient().setMapper(new HealeniumMapper(new MobileStackTraceReader()));
         return create(engine);
     }

@@ -40,21 +40,23 @@ public class MobileSelfHealingProxyInvocationHandler extends BaseHandler impleme
     public Object invoke(Object proxy, Method method, Method proceed, Object[] args) throws Throwable {
         switch (method.getName()) {
             case "findElement":
-                return wrap(findElement((By) args[0]));
+                WebElement element = findElement((By) args[0]);
+                return engine.isProxy() ? element : wrap(element);
             case "findElements":
                 List<WebElement> elements = findElements((By) args[0]);
-                return elements.stream().map(this::wrap).collect(Collectors.toList());
+                return engine.isProxy() ? elements : elements.stream().map(this::wrap).collect(Collectors.toList());
             case "switchTo":
                 WebDriver.TargetLocator switched = (WebDriver.TargetLocator) method.invoke(driver, args);
                 ClassLoader loader = driver.getClass().getClassLoader();
-                return wrapTarget(switched, loader);
+                return engine.isProxy() ? wrapTarget(switched, loader) : switched;
             default:
                 By locator = MOBILE_METHOD_MAP.get(method.getName()).apply((String) args[0]);
                 if (method.getName().contains("findElements")) {
                     List<WebElement> elementsBy = findElements(locator);
-                    return elementsBy.stream().map(this::wrap).collect(Collectors.toList());
+                    return engine.isProxy() ? elementsBy : elementsBy.stream().map(this::wrap).collect(Collectors.toList());
                 } else {
-                    return wrap(findElement(locator));
+                    WebElement el = findElement(locator);
+                    return engine.isProxy() ? el : wrap(el);
                 }
         }
     }
