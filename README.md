@@ -37,7 +37,7 @@ for Maven projects:
     dc.setCapability(MobileCapabilityType.DEVICE_NAME, "emulator-5554");
     dc.setCapability(MobileCapabilityType.PLATFORM_NAME, "android");
     
-    //used custom Login Form application on android emulator
+    //Your application
     dc.setCapability(MobileCapabilityType.APP, "https://github.com/healenium/example_appium_mvn/raw/feature/EPMHLM-209/src/test/resources/apps/login-form.apk");
 
     //declare delegate driver
