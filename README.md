@@ -28,7 +28,7 @@ for Maven projects:
 	<version>1.2.3</version>
 </dependency>
 ```
-### 1. Driver initialization
+### 2. Driver initialization
  Wrapping driver instance with default config:
 ``` 
     //Appium settings for choosen mobile platform (Android support implemented)
