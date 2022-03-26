@@ -15,7 +15,7 @@ appium adaptor for self-healing
 for Gradle projects:
 ``` 
 dependencies {
-    compile group: 'com.epam.healenium', name: 'healenium-appium', version: '1.2.3'
+    compile group: 'com.epam.healenium', name: 'healenium-appium', version: '1.2.4'
 }
 ```
 
@@ -25,7 +25,7 @@ for Maven projects:
 <dependency>
 	<groupId>com.epam.healenium</groupId>
 	<artifactId>healenium-appium</artifactId>
-	<version>1.2.3</version>
+	<version>1.2.4</version>
 </dependency>
 ```
 ### 2. Driver initialization
