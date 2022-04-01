@@ -71,7 +71,6 @@
         <treecomparing.version>0.4.10</treecomparing.version>
         <selenium.version>3.141.59</selenium.version>
         <commonslang3.version>3.11</commonslang3.version>
-        <slf4jsimple.version>1.7.30</slf4jsimple.version>
         <annotations.version>18.0.0</annotations.version>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <lombok.version>1.18.20</lombok.version>
@@ -252,12 +251,6 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>${commonslang3.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${slf4jsimple.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
