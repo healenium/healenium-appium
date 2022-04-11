@@ -6,14 +6,16 @@ appium adaptor for self-healing
 
 ## How to start
 
-### 0. For version 1.2.2 and higher start hlm-backend by [instruction](https://github.com/healenium/healenium-backend) 
+### 0. For version 1.2.3 and higher start hlm-backend by [instruction](https://github.com/healenium/healenium-backend) 
 
-### 0.1 Add dependency 
+### 0.1 Use example to get to know Healenium-appium solution: [healenium-appium-example](https://github.com/healenium/example_appium_mvn)
+
+### 1. Add dependency 
 
 for Gradle projects:
 ``` 
 dependencies {
-    compile group: 'com.epam.healenium', name: 'healenium-appium', version: '1.2.2'
+    compile group: 'com.epam.healenium', name: 'healenium-appium', version: '1.2.4'
 }
 ```
 
@@ -23,10 +25,10 @@ for Maven projects:
 <dependency>
 	<groupId>com.epam.healenium</groupId>
 	<artifactId>healenium-appium</artifactId>
-	<version>1.2.2</version>
+	<version>1.2.4</version>
 </dependency>
 ```
-### 1. Driver initialization
+### 2. Driver initialization
  Wrapping driver instance with default config:
 ``` 
     //Appium settings for choosen mobile platform (Android support implemented)
@@ -35,20 +37,8 @@ for Maven projects:
     dc.setCapability(MobileCapabilityType.DEVICE_NAME, "emulator-5554");
     dc.setCapability(MobileCapabilityType.PLATFORM_NAME, "android");
     
-    //used default Calculator application on android emulator
-    dc.setCapability("appPackage", "com.android.calculator2");
-    dc.setCapability("appActivity", ".Calculator");
-
-    /*
-       You could replace your old successfuly tested locators by new values
-       to check healenium-appium working without tested appication modification.
-       You must start your replacement key in dc.setCapability with prefix 'test_data'.
-       For example:
-       
-       dc.setCapability("test_data:old_test_method_name:old_locator", "new_test_method_name:new_locator");
-       Such key-value pairs will be processed.
-    */
-    dc.setCapability("test_data:testResultOk:result", "testResultHealed:resul");
+    //Your application
+    dc.setCapability(MobileCapabilityType.APP, "https://github.com/healenium/example_appium_mvn/raw/feature/EPMHLM-209/src/test/resources/apps/login-form.apk");
 
     //declare delegate driver
     AppiumDriver driver = new AndroidDriver<AndroidElement>(new URL("http://127.0.0.1:4723/wd/hub"), dc);
@@ -60,14 +50,12 @@ for Maven projects:
  be used when backend-integration set to 'false'.
  Default config values:
 ``` 
-    recovery-tries = 3
-    basePath = sha/healenium
-    reportPath = build/reports
-    screenshotPath = build/screenshots/
-    heal-enabled = true
-    backend-integration = true
-    serverHost = localhost
-    serverPort = 7878
+	recovery-tries = 1
+	score-cap = 0.5
+	heal-enabled = true
+	serverHost = localhost
+	serverPort = 7878
+	imitatePort = 8000
  ```
 
  > recovery-tries - list of proposed healed locators
