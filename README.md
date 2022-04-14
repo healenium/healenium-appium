@@ -6,7 +6,7 @@ appium adaptor for self-healing
 
 ## How to start
 
-### 0. For version 1.2.3 and higher start hlm-backend by [instruction](https://github.com/healenium/healenium-backend) 
+### 0. Start hlm-backend by [instruction](https://github.com/healenium/healenium-backend) 
 
 ### 0.1 Use example to get to know Healenium-appium solution: [healenium-appium-example](https://github.com/healenium/example_appium_mvn)
 
@@ -15,7 +15,7 @@ appium adaptor for self-healing
 for Gradle projects:
 ``` 
 dependencies {
-    compile group: 'com.epam.healenium', name: 'healenium-appium', version: '1.2.4'
+    compile group: 'com.epam.healenium', name: 'healenium-appium', version: '1.2.5'
 }
 ```
 
@@ -25,7 +25,7 @@ for Maven projects:
 <dependency>
 	<groupId>com.epam.healenium</groupId>
 	<artifactId>healenium-appium</artifactId>
-	<version>1.2.4</version>
+	<version>1.2.5</version>
 </dependency>
 ```
 ### 2. Driver initialization
