@@ -26,80 +26,80 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
+//import java.net.MalformedURLException;
+//import java.net.URL;
+//import java.util.List;
 
 @Slf4j
 public class TestEmulatorCalcApp extends AbstractBackendIT{
 
     private static AppiumDriver appiumDriver;
 
-    @SneakyThrows
-    @BeforeAll
-    public static void setUp() throws MalformedURLException {
-        DesiredCapabilities dc = new DesiredCapabilities();
-
-        dc.setCapability(MobileCapabilityType.DEVICE_NAME, "emulator-5554");
-        dc.setCapability(MobileCapabilityType.PLATFORM_NAME, "android");
-        dc.setCapability("appPackage", "com.android.calculator2");
-        dc.setCapability("appActivity", ".Calculator");
-
-        dc.setCapability("test_data:testResultOk:result", "testResultHealed:result");
-        dc.setCapability("test_data:testFindElementsOk:digit_7", "testFindElementsHealed:digit_77");
-
-        //declare delegate driver
-        appiumDriver = new AndroidDriver<AndroidElement>(new URL("http://0.0.0.0:4723/wd/hub"), dc);
-
-        //adding healing support
-        appiumDriver = DriverWrapper.wrap(appiumDriver);
-    }
-
-    @SneakyThrows
-    @Test
-    public void testResultOk() {
-        testAddOperation();
-        Assert.assertEquals(appiumDriver.findElementById("result").getText(), "61");
-    }
-
-    @SneakyThrows
-    @Test
-    public void testResultHealed() {
-        testAddOperation();
-        Assert.assertEquals(appiumDriver.findElementById("result").getText(), "61");
-    }
-
-    @Test
-    public void testFindElementsOk() {
-        List<MobileElement> elements = appiumDriver.findElements(By.id("digit_7"));
-        Assert.assertEquals("Digit 7", "7", elements.get(0).getText());
-    }
-
-    @Test
-    public void testFindElementsHealed() {
-        List<MobileElement> elements = appiumDriver.findElements(By.id("digit_77"));
-        Assert.assertEquals("Healed digit", "7", elements.get(0).getText());
-    }
-
-    private void testAddOperation() {
-        MobileElement el1 = (MobileElement) appiumDriver.findElementById("digit_2");
-        el1.click();
-        MobileElement el2 = (MobileElement) appiumDriver.findElementById("digit_5");
-        el2.click();
-        MobileElement el3 = (MobileElement) appiumDriver.findElementByAccessibilityId("plus");
-        el3.click();
-        MobileElement el4 = (MobileElement) appiumDriver.findElementById("digit_3");
-        el4.click();
-        MobileElement el5 = (MobileElement) appiumDriver.findElementById("digit_6");
-        el5.click();
-        MobileElement el6 = (MobileElement) appiumDriver.findElementByAccessibilityId("equals");
-        el6.click();
-    }
-
-    @AfterAll
-    public static void tearDown() {
-        if (appiumDriver != null) {
-            appiumDriver.quit();
-        }
-    }
+//    @SneakyThrows
+//    @BeforeAll
+//    public static void setUp() throws MalformedURLException {
+//        DesiredCapabilities dc = new DesiredCapabilities();
+//
+//        dc.setCapability(MobileCapabilityType.DEVICE_NAME, "emulator-5554");
+//        dc.setCapability(MobileCapabilityType.PLATFORM_NAME, "android");
+//        dc.setCapability("appPackage", "com.android.calculator2");
+//        dc.setCapability("appActivity", ".Calculator");
+//
+//        dc.setCapability("test_data:testResultOk:result", "testResultHealed:result");
+//        dc.setCapability("test_data:testFindElementsOk:digit_7", "testFindElementsHealed:digit_77");
+//
+//        //declare delegate driver
+//        appiumDriver = new AndroidDriver<AndroidElement>(new URL("http://0.0.0.0:4723/wd/hub"), dc);
+//
+//        //adding healing support
+//        appiumDriver = DriverWrapper.wrap(appiumDriver);
+//    }
+//
+//    @SneakyThrows
+//    @Test
+//    public void testResultOk() {
+//        testAddOperation();
+//        Assert.assertEquals(appiumDriver.findElementById("result").getText(), "61");
+//    }
+//
+//    @SneakyThrows
+//    @Test
+//    public void testResultHealed() {
+//        testAddOperation();
+//        Assert.assertEquals(appiumDriver.findElementById("result").getText(), "61");
+//    }
+//
+//    @Test
+//    public void testFindElementsOk() {
+//        List<MobileElement> elements = appiumDriver.findElements(By.id("digit_7"));
+//        Assert.assertEquals("Digit 7", "7", elements.get(0).getText());
+//    }
+//
+//    @Test
+//    public void testFindElementsHealed() {
+//        List<MobileElement> elements = appiumDriver.findElements(By.id("digit_77"));
+//        Assert.assertEquals("Healed digit", "7", elements.get(0).getText());
+//    }
+//
+//    private void testAddOperation() {
+//        MobileElement el1 = (MobileElement) appiumDriver.findElementById("digit_2");
+//        el1.click();
+//        MobileElement el2 = (MobileElement) appiumDriver.findElementById("digit_5");
+//        el2.click();
+//        MobileElement el3 = (MobileElement) appiumDriver.findElementByAccessibilityId("plus");
+//        el3.click();
+//        MobileElement el4 = (MobileElement) appiumDriver.findElementById("digit_3");
+//        el4.click();
+//        MobileElement el5 = (MobileElement) appiumDriver.findElementById("digit_6");
+//        el5.click();
+//        MobileElement el6 = (MobileElement) appiumDriver.findElementByAccessibilityId("equals");
+//        el6.click();
+//    }
+//
+//    @AfterAll
+//    public static void tearDown() {
+//        if (appiumDriver != null) {
+//            appiumDriver.quit();
+//        }
+//    }
 }
