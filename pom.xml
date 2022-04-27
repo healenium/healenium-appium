@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.epam.healenium</groupId>
     <artifactId>healenium-appium</artifactId>
-    <version>1.2.5</version>
+    <version>${revision}</version>
     <packaging>jar</packaging>
     <name>healenium-appium</name>
     <description>healenium appium client</description>
