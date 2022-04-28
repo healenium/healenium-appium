@@ -55,7 +55,7 @@
 
 
     <properties>
-        <healenium.version>3.2.4</healenium.version>
+        <healenium.version>${web}</healenium.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
