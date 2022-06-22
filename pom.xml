@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.epam.healenium</groupId>
     <artifactId>healenium-appium</artifactId>
-    <version>1.2.5</version>
+    <version>1.2.6</version>
     <packaging>jar</packaging>
     <name>healenium-appium</name>
     <description>healenium appium client</description>
@@ -55,7 +55,7 @@
 
 
     <properties>
-        <healenium.version>3.2.4</healenium.version>
+        <healenium.version>3.2.5</healenium.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
