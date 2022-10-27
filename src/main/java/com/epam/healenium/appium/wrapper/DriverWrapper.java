@@ -40,14 +40,21 @@ import org.openqa.selenium.Capabilities;
 public final class DriverWrapper {
 
     /**
-     * Instantiates the self-healing driver.
+     * Don't use wrapper to create SelfHealingDriver for Appium.
      *
-     * @param delegate the original driver.
+     * Use remote driver with connection to hlm-proxy
      */
+    @Deprecated
     public static <T extends AppiumDriver> T wrap(T delegate) {
         return wrap(delegate, null);
     }
 
+    /**
+     * Don't use wrapper to create SelfHealingDriver for Appium.
+     *
+     * Use remote driver with connection to hlm-proxy
+     */
+    @Deprecated
     public static <T extends AppiumDriver> T wrap(T delegate, Config config) {
         if(config == null){
             config = ConfigFactory.systemProperties()
@@ -62,6 +69,12 @@ public final class DriverWrapper {
         return create(engine);
     }
 
+    /**
+     * Don't use wrapper to create SelfHealingDriver for Appium.
+     *
+     * Use remote driver with connection to hlm-proxy
+     */
+    @Deprecated
     public static <T extends AppiumDriver> T create(SelfHealingEngine engine){
         T origin = (T) engine.getWebDriver();
         try{
