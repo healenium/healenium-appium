@@ -15,7 +15,7 @@ appium adaptor for self-healing
 for Gradle projects:
 ``` 
 dependencies {
-    compile group: 'com.epam.healenium', name: 'healenium-appium', version: '1.2.5'
+    compile group: 'com.epam.healenium', name: 'healenium-appium', version: '1.3.0'
 }
 ```
 
@@ -25,7 +25,7 @@ for Maven projects:
 <dependency>
 	<groupId>com.epam.healenium</groupId>
 	<artifactId>healenium-appium</artifactId>
-	<version>1.2.5</version>
+	<version>1.3.0</version>
 </dependency>
 ```
 ### 2. Driver initialization
@@ -49,13 +49,12 @@ for Maven projects:
  healenium-appium uses healenium-backend for these purposes. File system storage also supports and could
  be used when backend-integration set to 'false'.
  Default config values:
-``` 
+```
 	recovery-tries = 1
 	score-cap = 0.5
 	heal-enabled = true
-	serverHost = localhost
-	serverPort = 7878
-	imitatePort = 8000
+	hlm.server.url = http://localhost:7878
+	hlm.imitator.url = http://localhost:8000
  ```
 
  > recovery-tries - list of proposed healed locators
