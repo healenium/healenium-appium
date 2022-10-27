@@ -3,7 +3,6 @@ package com.epam.healenium.appium.handlers.proxy;
 import com.epam.healenium.SelfHealingEngine;
 import com.epam.healenium.appium.wrapper.ElementWrapper;
 import com.epam.healenium.handlers.proxy.WebElementProxyHandler;
-import io.appium.java_client.MobileElement;
 import javassist.util.proxy.MethodHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
@@ -17,7 +16,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MobileWebElementProxyHandler extends WebElementProxyHandler implements MethodHandler, MobileBaseHandler {
 
-    public <T extends MobileElement> MobileWebElementProxyHandler(WebElement delegate, SelfHealingEngine engine) {
+    public <T extends WebElement> MobileWebElementProxyHandler(WebElement delegate, SelfHealingEngine engine) {
         super(delegate, engine);
     }
 
