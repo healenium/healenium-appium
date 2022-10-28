@@ -1,83 +1,105 @@
-# healenium-appium
-appium adaptor for self-healing
+# Healenium-Appium
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.epam.healenium/healenium-appium/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.epam.healenium/healenium-appium/)
-[![Build Status](https://github.com/healenium/healenium-appium/workflows/Java-CI-test/badge.svg)](https://github.com/healenium/healenium-appium/workflows/Java-CI-test/badge.svg)
+[![Docker Pulls](https://img.shields.io/docker/pulls/healenium/hlm-backend.svg?maxAge=25920)](https://hub.docker.com/u/healenium)
+[![License](https://img.shields.io/badge/license-Apache-brightgreen.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
-## How to start
+### Table of Contents
 
-### 0. Start hlm-backend by [instruction](https://github.com/healenium/healenium-backend) 
+[Overall information](#overall-information)
 
-### 0.1 Use example to get to know Healenium-appium solution: [healenium-appium-example](https://github.com/healenium/example_appium_mvn)
+[Compatibility with OSs](#compatibility-with-oss)
 
-### 1. Add dependency 
+[Healenium Appium installation](#healenium-appium-installation)
 
-for Gradle projects:
-``` 
-dependencies {
-    compile group: 'com.epam.healenium', name: 'healenium-appium', version: '1.2.5'
-}
+[Language Examples](#language-examples)
+* [Java](#java)
+* [Python](#python)
+
+
+### Overall information
+Self-healing framework based on Selenium and able to use all Selenium supported languages like Java/Python/JS/C#
+Healenium acts as proxy between client and Appium server.
+
+`Docker-compose` includes the following services:
+- `postgres-db` (PostgreSQL database to store etalon selector / healing / report)
+- `hlm-proxy` (Proxy client request to Appium server)
+- `hlm-backend` (CRUD service)
+- `selector-imitator` (Convert healed locator to convenient format)
+
+### Compatibility with OSs
+
+Support: Android Web, Android native app, IOS Web.
+
+NOT Support: IOS native app.
+
+> Unfortunately, Healenium-Appium doesn't support IOS native apps at present. 
+> But we plan to release to support IOS apps in the near future. 
+
+
+### Healenium-Appium installation
+
+Clone Healenium repository:
+```sh
+git clone https://github.com/healenium/healenium.git
 ```
 
-for Maven projects:
-``` 
+> Before run healenium you have to specify appium server host and port using appropriate environment variables of hlm-proxy container: APPIUM_HOST, APPIUM_PORT
 
-<dependency>
-	<groupId>com.epam.healenium</groupId>
-	<artifactId>healenium-appium</artifactId>
-	<version>1.2.5</version>
-</dependency>
+Example setup hlm-proxy's env variables in case of local Appium server (specified by default):
+
+```dockerfile
+  - APPIUM_HOST=host.docker.internal
+  - APPIUM_PORT=4723
 ```
-### 2. Driver initialization
- Wrapping driver instance with default config:
-``` 
-    //Appium settings for choosen mobile platform (Android support implemented)
-    DesiredCapabilities dc = new DesiredCapabilities();
 
-    dc.setCapability(MobileCapabilityType.DEVICE_NAME, "emulator-5554");
-    dc.setCapability(MobileCapabilityType.PLATFORM_NAME, "android");
+Run Healenium with Appium
+
+```sh
+docker-compose up -d
+```
+
+### Language examples
+
+
+```
+    /**
+    * "http://127.0.0.1:8085" OR "http://localhost:8085" if you are using locally running proxy server
+    *
+    * if you want to use a remote proxy server,
+    * specify the ip address of this server - "http://remote_ip_address:8085"
+    */
+```
+
+###### Java:
+```java
+    String nodeURL = "http://localhost:8085";
+
+    MutableCapabilities cap = new MutableCapabilities();
+    cap.setCapability("platformName", "android");
+    cap.setCapability("deviceName", "emulator-5554");
+    cap.setCapability("browserName", "chrome");
+    cap.setCapability("nativeWebScreenshot",true);
+
+    AppiumDriver driver = new AppiumDriver(new URL(nodeURL), cap);
+```
+
+###### Python
+```py
+    nodeURL = "http://localhost:8085"
     
-    //Your application
-    dc.setCapability(MobileCapabilityType.APP, "https://github.com/healenium/example_appium_mvn/raw/feature/EPMHLM-209/src/test/resources/apps/login-form.apk");
+    # Set the desired capabilities.
+    desired_caps = {}
+    desired_caps['platformName'] = 'Android'
+    desired_caps['platformVersion'] = '9'
+    desired_caps['deviceName'] = 'emulator-5554'
+    desired_caps['browserName'] = 'chrome'
+    desired_caps['nativeWebScreenshot'] = 'true'
 
-    //declare delegate driver
-    AppiumDriver driver = new AndroidDriver<AndroidElement>(new URL("http://127.0.0.1:4723/wd/hub"), dc);
-    //adding healing support
-    driver = DriverWrapper.wrap(driver);
- ```
- Old versions of healenium-appium use file system to store locators and report-data. Since version 1.1 
- healenium-appium uses healenium-backend for these purposes. File system storage also supports and could
- be used when backend-integration set to 'false'.
- Default config values:
-``` 
-	recovery-tries = 1
-	score-cap = 0.5
-	heal-enabled = true
-	serverHost = localhost
-	serverPort = 7878
-	imitatePort = 8000
- ```
+    wd = webdriver.Remote('http://127.0.0.1:8085', desired_caps)
+```
 
- > recovery-tries - list of proposed healed locators
+## Community / Support
 
- > basePath - folder to store base locators path
-
- > **Important!** Do not delete data from the folder where files with new locators are stored. They are used to perform self-healing in next automation runs
-
- > reportPath - folder to save test report with healing information
-
- > screenshotPath - folder to save screenshots of healed elements
-
- > heal-enabled - you could enable or disable healing by setting true or false flag to this variable
-
- > backend-integration - you could enable or disable usage of healenium-backend to store locators and report-data
- 
- > serverHost - ip or name where hlm-backend instance is installed
- 
- > serverPort - port on which hlm-backend instance is installed (7878 by default)
-
-* Suggested way is to declare custom config or property file (ex. sha.properties) and set
-``` basePath = sha/selenium```
-
-Also you could set configs via -D or System properties, for example to turn off healing for current test run:
-```-Dheal-enabled=false```
+* [Telegram chat](https://t.me/healenium)
+* [GitHub Issues](https://github.com/healenium/healenium/issues)
+* [YouTube Channel](https://www.youtube.com/channel/UCsZJ0ri-Hp7IA1A6Fgi4Hvg)
