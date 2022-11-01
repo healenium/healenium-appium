@@ -12,8 +12,6 @@ import org.jsoup.parser.Parser;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,12 +32,7 @@ public class MobileNodeService extends NodeService {
 
     @Override
     public List<Node> getNodePath(WebElement element) {
-        log.debug("* getNodePath start: " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME));
-
-        List<Node> path = getHierarchyElements(element);
-
-        log.debug("* getNodePath finish: " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME));
-        return path;
+        return getHierarchyElements(element);
     }
 
     private List<Node> getHierarchyElements(WebElement element) {
