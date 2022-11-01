@@ -2,6 +2,7 @@
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/healenium/hlm-backend.svg?maxAge=25920)](https://hub.docker.com/u/healenium)
 [![License](https://img.shields.io/badge/license-Apache-brightgreen.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![@healenium](https://img.shields.io/badge/Telegram-%40healenium-orange.svg)](https://t.me/healenium)
 
 ### Table of Contents
 
@@ -43,23 +44,27 @@ Clone Healenium repository:
 git clone https://github.com/healenium/healenium.git
 ```
 
-> Before run healenium you have to specify appium server host and port using appropriate environment variables of hlm-proxy container: APPIUM_HOST, APPIUM_PORT
+> Before run healenium you have to specify appium server host and port using appropriate environment variables of hlm-proxy container: APPIUM_SERVER_URL
 
 Example setup hlm-proxy's env variables in case of local Appium server (specified by default):
 
 ```dockerfile
-  - APPIUM_HOST=host.docker.internal
-  - APPIUM_PORT=4723
+    - APPIUM_SERVER_URL=http://host.docker.internal:4723/wd/hub
 ```
 
-Run Healenium with Appium
+Run Healenium with Appium only
+
+```sh
+docker-compose -f docker-compose-appium.yaml up -d
+```
+
+Run Healenium with Appium and Selenoid
 
 ```sh
 docker-compose up -d
 ```
 
 ### Language examples
-
 
 ```
     /**
