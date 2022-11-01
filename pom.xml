@@ -55,6 +55,7 @@
 
 
     <properties>
+        <healenium.version>3.3.1</healenium.version>
         <healenium.version>${web}</healenium.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <typesafe.version>1.3.4</typesafe.version>
