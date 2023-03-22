@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.epam.healenium</groupId>
     <artifactId>healenium-appium</artifactId>
-    <version>1.4.0</version>
+    <version>1.5.0</version>
     <packaging>jar</packaging>
     <name>healenium-appium</name>
     <description>healenium appium client</description>
@@ -55,7 +55,7 @@
 
 
     <properties>
-        <healenium.version>3.3.1</healenium.version>
+        <healenium.version>3.4.0</healenium.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <typesafe.version>1.3.4</typesafe.version>
         <commonslang3.version>3.11</commonslang3.version>
@@ -65,8 +65,7 @@
         <lombok.version>1.18.20</lombok.version>
         <javassist.version>3.26.0-GA</javassist.version>
         <junit.version>5.7.1</junit.version>
-        <appium.version>8.2.0</appium.version>
-        <okhttp3.version>4.9.3</okhttp3.version>
+        <appium.version>8.3.0</appium.version>
     </properties>
 
     <profiles>
@@ -190,11 +189,6 @@
             <groupId>com.epam.healenium</groupId>
             <artifactId>healenium-web</artifactId>
             <version>${healenium.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>${okhttp3.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>

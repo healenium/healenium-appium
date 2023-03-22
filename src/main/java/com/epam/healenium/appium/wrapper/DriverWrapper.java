@@ -63,7 +63,7 @@ public final class DriverWrapper {
         }
         SelfHealingEngine engine = new MobileSelfHealingEngine(delegate, config);
         engine.setClient(new RestClient(engine.getConfig()));
-        engine.setNodeService(new MobileNodeService(delegate));
+        engine.setNodeService(new MobileNodeService());
         engine.setHealingService(new MobileHealingService(engine.getConfig(), delegate));
         engine.getClient().setMapper(new HealeniumMapper(new MobileStackTraceReader()));
         return create(engine);
@@ -88,7 +88,7 @@ public final class DriverWrapper {
                     new MobileSelfHealingProxyInvocationHandler(engine)
             );
         } catch (Exception ex){
-            log.error("Failed to create wrapper!", ex);
+            log.error("Failed to create wrapper! Exception: {0}", ex);
             return origin;
         }
     }
