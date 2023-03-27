@@ -26,16 +26,12 @@ public class MobileNodeService extends NodeService {
     private static final int ONE_ELEMENT = 1;
     private static final int THE_ONLY_ELEMENT = 0;
 
-    public MobileNodeService(WebDriver driver) {
-        super(driver);
-    }
-
     @Override
-    public List<Node> getNodePath(WebElement element) {
-        return getHierarchyElements(element);
+    public List<Node> getNodePath(WebDriver driver, WebElement element) {
+        return getHierarchyElements(driver, element);
     }
 
-    private List<Node> getHierarchyElements(WebElement element) {
+    private List<Node> getHierarchyElements(WebDriver driver, WebElement element) {
         String xmlString = driver.getPageSource();
 
         Document doc = Jsoup.parse(xmlString, "", Parser.xmlParser());
