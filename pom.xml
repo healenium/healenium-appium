@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.epam.healenium</groupId>
     <artifactId>healenium-appium</artifactId>
-    <version>1.5.0</version>
+    <version>1.5.2</version>
     <packaging>jar</packaging>
     <name>healenium-appium</name>
     <description>healenium appium client</description>
@@ -55,13 +55,12 @@
 
 
     <properties>
-        <healenium.version>3.4.0</healenium.version>
+        <healenium.version>3.4.2</healenium.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <typesafe.version>1.3.4</typesafe.version>
         <commonslang3.version>3.11</commonslang3.version>
         <slf4jsimple.version>1.7.30</slf4jsimple.version>
         <annotations.version>18.0.0</annotations.version>
-        <mapstruct.version>1.4.2.Final</mapstruct.version>
         <lombok.version>1.18.20</lombok.version>
         <javassist.version>3.26.0-GA</javassist.version>
         <junit.version>5.7.1</junit.version>
@@ -224,12 +223,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct</artifactId>
-            <version>${mapstruct.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
@@ -246,11 +239,6 @@
             <artifactId>junit-jupiter-api</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct-processor</artifactId>
-            <version>${mapstruct.version}</version>
         </dependency>
         <dependency>
             <groupId>io.appium</groupId>
