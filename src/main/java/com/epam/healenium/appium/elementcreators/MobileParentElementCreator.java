@@ -6,7 +6,7 @@ import com.epam.healenium.appium.elementcreators.attribute.ResourceIdElementCrea
 import com.epam.healenium.appium.elementcreators.attribute.TextElementCreator;
 import com.epam.healenium.elementcreators.ElementCreator;
 import com.epam.healenium.treecomparing.Node;
-import org.mapstruct.ap.internal.util.Strings;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -27,7 +27,7 @@ public class MobileParentElementCreator implements ElementCreator {
         }
         return Stream.of(classElementCreator, resourceIdElementCreator, idElementCreator, textCreator, contentDescElementCreator)
                 .map(creator -> creator.create(parent))
-                .filter(Strings::isNotEmpty)
+                .filter(s -> !StringUtils.isEmpty(s))
                 .collect(Collectors.joining())
                 .concat("/");
     }
