@@ -1,5 +1,6 @@
 package com.epam.healenium.appium.service;
 
+import com.epam.healenium.model.Context;
 import com.epam.healenium.service.NodeService;
 import com.epam.healenium.treecomparing.Node;
 import com.epam.healenium.treecomparing.NodeBuilder;
@@ -27,7 +28,7 @@ public class MobileNodeService extends NodeService {
     private static final int THE_ONLY_ELEMENT = 0;
 
     @Override
-    public List<Node> getNodePath(WebDriver driver, WebElement element) {
+    public List<Node> getNodePath(WebDriver driver, WebElement element, Context context) {
         return getHierarchyElements(driver, element);
     }
 
@@ -48,16 +49,16 @@ public class MobileNodeService extends NodeService {
     }
 
     private Element getElementFromDoc(Document doc, WebElement webElement) {
-        List<String> paramsList = Arrays.asList("resource-id", "content-desc", "text", "class", "bounds", "checked",
-                "enabled", "selected", "focused", "displayed");
+        List<String> paramsList = Arrays.asList("bounds", "resource-id", "class", "content-desc", "text", "checked",
+                "enabled", "selected", "focused", "displayed", "type", "name", "value", "label", "visible", "accessible");
 
         List<Element> tempElements = new ArrayList<>(doc.getAllElements());
-        Iterator<String> it = paramsList.iterator();
 
         if (tempElements.size() == ONE_ELEMENT) {
             return tempElements.get(THE_ONLY_ELEMENT);
         }
 
+        Iterator<String> it = paramsList.iterator();
         while (it.hasNext()) {
             String nextParam = it.next();
             String tempValue = webElementParamValue(nextParam, webElement);
@@ -81,9 +82,11 @@ public class MobileNodeService extends NodeService {
         list.forEach(attr -> otherAttributes.put(attr.getKey(), attr.getValue()));
 
         return new NodeBuilder()
-                .setTag(e.attributes().get("class"))
-                .setContent(Collections.singletonList(e.attributes().get("text")))
-                .setOtherAttributes(otherAttributes)
+                .setId(e.attributes().getIgnoreCase("resource-id"))
+                .setTag(e.attributes().getIgnoreCase("class"))
+                .setClasses(Collections.singleton(e.attributes().getIgnoreCase("content-desc")))
+                .setIndex(Integer.parseInt(e.attributes().getIgnoreCase("index")))
+                .setMobileAttributes(otherAttributes)
                 .build();
     }
 }
