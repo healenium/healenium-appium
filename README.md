@@ -29,13 +29,7 @@ Healenium acts as proxy between client and Appium server.
 
 ### Compatibility with OSs
 
-Support: Android Web, Android native app, IOS Web.
-
-NOT Support: IOS native app.
-
-> Unfortunately, Healenium-Appium doesn't support IOS native apps at present. 
-> But we plan to release to support IOS apps in the near future. 
-
+Support: Android Web/native and IOS Web/native apps.
 
 ### Healenium-Appium installation
 
