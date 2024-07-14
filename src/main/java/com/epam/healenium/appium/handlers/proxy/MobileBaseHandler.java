@@ -1,7 +1,6 @@
 package com.epam.healenium.appium.handlers.proxy;
 
 import com.google.common.collect.ImmutableMap;
-import io.appium.java_client.MobileBy;
 import org.openqa.selenium.By;
 
 import java.util.Map;
@@ -25,9 +24,5 @@ public interface MobileBaseHandler {
                     .put("findElementsByCssSelector", By::cssSelector)
                     .put("findElementById", By::id)
                     .put("findElementsById", By::id)
-                    .put("findElementByAccessibilityId", MobileBy::AccessibilityId)
-                    .put("findElementsByAccessibilityId", MobileBy::AccessibilityId)
-                    .put("findElementByXPath", MobileBy::xpath)
-                    .put("findElementsByXPath", MobileBy::xpath)
                     .build();
 }
