@@ -5,6 +5,7 @@ import com.epam.healenium.service.NodeService;
 import com.epam.healenium.treecomparing.Node;
 import com.epam.healenium.treecomparing.NodeBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Document;
@@ -81,11 +82,12 @@ public class MobileNodeService extends NodeService {
         List<Attribute> list = e.attributes().asList();
         list.forEach(attr -> otherAttributes.put(attr.getKey(), attr.getValue()));
 
+        String index = e.attributes().getIgnoreCase("index");
         return new NodeBuilder()
                 .setId(e.attributes().getIgnoreCase("resource-id"))
                 .setTag(e.attributes().getIgnoreCase("class"))
                 .setClasses(Collections.singleton(e.attributes().getIgnoreCase("content-desc")))
-                .setIndex(Integer.parseInt(e.attributes().getIgnoreCase("index")))
+                .setIndex(StringUtils.isEmpty(index) ? 0 : Integer.parseInt(index))
                 .setMobileAttributes(otherAttributes)
                 .build();
     }
