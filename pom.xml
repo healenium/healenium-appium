@@ -58,7 +58,7 @@
         <healenium.version>3.5.5</healenium.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <typesafe.version>1.3.4</typesafe.version>
-        <commonslang3.version>3.11</commonslang3.version>
+        <commonslang3.version>3.18.0</commonslang3.version>
         <slf4jsimple.version>1.7.30</slf4jsimple.version>
         <annotations.version>18.0.0</annotations.version>
         <lombok.version>1.18.20</lombok.version>
