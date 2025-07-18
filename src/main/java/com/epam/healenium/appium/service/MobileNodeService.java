@@ -14,81 +14,143 @@ import org.jsoup.parser.Parser;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public class MobileNodeService extends NodeService {
-    private static final int ONE_ELEMENT = 1;
-    private static final int THE_ONLY_ELEMENT = 0;
+
+    private static final List<String> KEY_ATTRIBUTES = Arrays.asList("resource-id", "class", "content-desc", "text", "bounds");
 
     @Override
     public List<Node> getNodePath(WebDriver driver, WebElement element, Context context) {
-        return getHierarchyElements(driver, element);
+        try {
+            return buildNodePath(driver, element);
+        } catch (Exception e) {
+            log.error("Failed to build node path for element. Attributes: {}", getWebElementAttributes(element), e);
+            throw new IllegalStateException("Cannot build node path: " + e.getMessage(), e);
+        }
     }
 
-    private List<Node> getHierarchyElements(WebDriver driver, WebElement element) {
+    private List<Node> buildNodePath(WebDriver driver, WebElement element) {
         String xmlString = driver.getPageSource();
+        log.debug("Page source length: {}", xmlString.length());
 
         Document doc = Jsoup.parse(xmlString, "", Parser.xmlParser());
-        Element currentElementInDoc = getElementFromDoc(doc, element);
-        List<Node> list = new ArrayList<>();
+        Element matchingElement = findMatchingElement(doc, element);
 
-        while (currentElementInDoc.hasParent()) {
-            Node currentNode = toNode(currentElementInDoc);
-            list.add(currentNode);
-            currentElementInDoc = currentElementInDoc.parent();
+        List<Node> nodePath = new ArrayList<>();
+        Element currentElement = matchingElement;
+
+        while (currentElement != null) {
+            Node node = elementToNode(currentElement);
+            nodePath.add(node);
+            currentElement = currentElement.parent();
         }
-        Collections.reverse(list);
-        return new LinkedList<>(list);
+
+        Collections.reverse(nodePath);
+        log.info("Built node path with {} nodes", nodePath.size());
+        return new LinkedList<>(nodePath);
     }
 
-    private Element getElementFromDoc(Document doc, WebElement webElement) {
-        List<String> paramsList = Arrays.asList("bounds", "resource-id", "class", "content-desc", "text", "checked",
-                "enabled", "selected", "focused", "displayed", "type", "name", "value", "label", "visible", "accessible");
+    private Element findMatchingElement(Document doc, WebElement webElement) {
+        List<Element> elements = new ArrayList<>(doc.getAllElements());
+        log.debug("Total elements in document: {}", elements.size());
 
-        List<Element> tempElements = new ArrayList<>(doc.getAllElements());
-
-        if (tempElements.size() == ONE_ELEMENT) {
-            return tempElements.get(THE_ONLY_ELEMENT);
+        if (elements.isEmpty()) {
+            throw new IllegalStateException("Document contains no elements");
         }
 
-        Iterator<String> it = paramsList.iterator();
-        while (it.hasNext()) {
-            String nextParam = it.next();
-            String tempValue = webElementParamValue(nextParam, webElement);
-            tempElements.removeIf(e -> !e.attributes().get(nextParam).equals(tempValue));
+        Map<String, String> webElementAttrs = getWebElementAttributes(webElement);
 
-            if (tempElements.size() == ONE_ELEMENT) {
-                return tempElements.get(THE_ONLY_ELEMENT);
+        for (String attr : KEY_ATTRIBUTES) {
+            String webValue = webElementAttrs.get(attr);
+            if (StringUtils.isBlank(webValue)) {
+                log.debug("Skipping filter for attribute '{}' with empty or null value", attr);
+                continue;
+            }
+
+            elements.removeIf(e -> {
+                String docValue = e.attributes().get(attr);
+                String normalizedDocValue = StringUtils.defaultString(docValue);
+                return !webValue.equals(normalizedDocValue);
+            });
+
+            log.debug("Elements after filtering by '{}': {}", attr, elements.size());
+
+            if (elements.size() == 1) {
+                log.info("Found matching element with attribute '{}'", attr);
+                return elements.get(0);
+            }
+            if (elements.isEmpty()) {
+                log.error("No elements match attribute '{}' with value '{}'. WebElement attributes: {}",
+                        attr, webValue, webElementAttrs);
+                throw new IllegalStateException("No elements match attribute '" + attr + "' with value '" + webValue + "'");
             }
         }
-        return tempElements.get(THE_ONLY_ELEMENT);
+
+        log.warn("Multiple elements ({}) remain after filtering. Selecting best match.", elements.size());
+        return selectBestMatch(elements, webElementAttrs);
     }
 
-    private String webElementParamValue(String currentAttribute, WebElement webElement) {
-        String temp = webElement.getAttribute(currentAttribute);
-        return temp != null ? temp : "";
+    private Element selectBestMatch(List<Element> elements, Map<String, String> webElementAttrs) {
+        Element bestMatch = null;
+        int maxMatches = -1;
+
+        for (Element element : elements) {
+            int matchCount = 0;
+            for (String attr : KEY_ATTRIBUTES) {
+                String webValue = webElementAttrs.get(attr);
+                String docValue = StringUtils.defaultString(element.attributes().get(attr));
+                if (webValue.equals(docValue)) {
+                    matchCount++;
+                }
+            }
+            if (matchCount > maxMatches) {
+                maxMatches = matchCount;
+                bestMatch = element;
+            }
+        }
+
+        if (bestMatch == null) {
+            log.error("No best match found among {} elements. WebElement attributes: {}", elements.size(), webElementAttrs);
+            throw new IllegalStateException("Unable to select a best match among multiple elements");
+        }
+
+        log.info("Selected best match with {} matching attributes", maxMatches);
+        return bestMatch;
     }
 
-    private Node toNode(Element e) {
-        Map<String, String> otherAttributes = new HashMap<>();
-        List<Attribute> list = e.attributes().asList();
-        list.forEach(attr -> otherAttributes.put(attr.getKey(), attr.getValue()));
+    private Map<String, String> getWebElementAttributes(WebElement webElement) {
+        Map<String, String> attributes = new HashMap<>();
+        for (String attr : KEY_ATTRIBUTES) {
+            try {
+                String value = webElement.getAttribute(attr);
+                if (value.equals("null")) {
+                    attributes.put(attr, "");
+                } else {
+                    attributes.put(attr, StringUtils.defaultString(value));
+                }
+            } catch (Exception e) {
+                log.debug("Failed to get attribute '{}' from WebElement", attr, e);
+                attributes.put(attr, "");
+            }
+        }
+        return attributes;
+    }
 
-        String index = e.attributes().getIgnoreCase("index");
+    private Node elementToNode(Element element) {
+        Map<String, String> attributes = new HashMap<>();
+        for (Attribute attr : element.attributes()) {
+            attributes.put(attr.getKey(), attr.getValue());
+        }
+
+        String index = element.attributes().getIgnoreCase("index");
         return new NodeBuilder()
-                .setId(e.attributes().getIgnoreCase("resource-id"))
-                .setTag(e.attributes().getIgnoreCase("class"))
-                .setClasses(Collections.singleton(e.attributes().getIgnoreCase("content-desc")))
+                .setId(element.attributes().getIgnoreCase("resource-id"))
+                .setTag(element.attributes().getIgnoreCase("class"))
+                .setClasses(Collections.singleton(element.attributes().getIgnoreCase("content-desc")))
                 .setIndex(StringUtils.isEmpty(index) ? 0 : Integer.parseInt(index))
-                .setMobileAttributes(otherAttributes)
+                .setMobileAttributes(attributes)
                 .build();
     }
 }
