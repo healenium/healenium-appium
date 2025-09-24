@@ -1,8 +1,10 @@
 package com.epam.healenium.appium.service;
 
+import com.epam.healenium.SelfHealingEngine;
 import com.epam.healenium.appium.MobileSelectorComponent;
 import com.epam.healenium.model.Context;
 import com.epam.healenium.model.HealedElement;
+import com.epam.healenium.model.Locator;
 import com.epam.healenium.service.HealingService;
 import com.epam.healenium.treecomparing.Node;
 import com.epam.healenium.treecomparing.Scored;
@@ -39,10 +41,10 @@ public class MobileHealingService extends HealingService {
     }
 
     @Override
-    protected HealedElement toLocator(Scored<Node> node, Context context) {
+    protected HealedElement toLocator(Scored<Node> node, Context context, SelfHealingEngine engine) {
         for (Set<MobileSelectorComponent> detailLevel : mobileSelectorDetailLevels) {
             By locator = mobileConstruct(node.getValue(), detailLevel);
-            if (locator == null) {
+            if (locator == null || isUnsuccessLocator(locator, context, engine)) {
                 continue;
             }
             List<WebElement> elements = driver.findElements(locator);
@@ -67,5 +69,11 @@ public class MobileHealingService extends HealingService {
                     : By.xpath("//".concat(xpath));
         }
         return null;
+    }
+
+    private boolean isUnsuccessLocator(By locator, Context context, SelfHealingEngine engine) {
+        Locator convertLocator = engine.getClient().getMapper().byToLocator(locator);
+        List<Locator> unsuccessfulLocators = context.getUnsuccessfulLocators();
+        return unsuccessfulLocators != null && unsuccessfulLocators.contains(convertLocator);
     }
 }
