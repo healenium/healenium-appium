@@ -52,7 +52,7 @@
         <lombok.version>1.18.20</lombok.version>
         <javassist.version>3.26.0-GA</javassist.version>
         <junit.version>5.7.1</junit.version>
-        <appium.version>9.2.3</appium.version>
+        <appium.version>10.1.1</appium.version>
     </properties>
 
     <profiles>
