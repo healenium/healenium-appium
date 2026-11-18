@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.epam.healenium</groupId>
     <artifactId>healenium-appium</artifactId>
-    <version>1.5.16</version>
+    <version>1.7.0</version>
     <packaging>jar</packaging>
     <name>healenium-appium</name>
     <description>healenium appium client</description>
@@ -43,16 +43,17 @@
     </scm>
 
     <properties>
-        <healenium.version>3.5.7</healenium.version>
+        <healenium.version>3.7.0</healenium.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <typesafe.version>1.3.4</typesafe.version>
         <commonslang3.version>3.11</commonslang3.version>
         <slf4jsimple.version>1.7.30</slf4jsimple.version>
         <annotations.version>18.0.0</annotations.version>
-        <lombok.version>1.18.20</lombok.version>
+        <lombok.version>1.18.38</lombok.version>
         <javassist.version>3.26.0-GA</javassist.version>
         <junit.version>5.7.1</junit.version>
-        <appium.version>9.2.3</appium.version>
+        <appium.version>10.1.1</appium.version>
+        <plexus-utils.version>3.6.1</plexus-utils.version>
     </properties>
 
     <profiles>
@@ -176,6 +177,16 @@
             <url>https://central.sonatype.com</url>
         </repository>
     </distributionManagement>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-utils</artifactId>
+                <version>${plexus-utils.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
